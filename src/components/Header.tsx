@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LineChart, Wallet } from 'lucide-react';
+import { LineChart, Wallet, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWallet } from '@/hooks/useWallet';
+import { MobileNavigation } from './MobileNavigation';
+import { SettingsPanel } from './SettingsPanel';
 
 export const Header = () => {
   const { wallet, connectWallet } = useWallet();
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,8 +77,24 @@ export const Header = () => {
               Docs
             </a>
           </nav>
+
+          {/* Mobile Navigation */}
+          <MobileNavigation 
+            wallet={wallet} 
+            onConnectWallet={connectWallet}
+          />
           
           <div className="flex gap-4 items-center">
+            {/* Settings Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSettingsOpen(true)}
+              className="hover:bg-green-50 hover:text-green-600 transition-all duration-200"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+
             {wallet.isConnected ? (
               <div className="flex items-center gap-3">
                 <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-2 shadow-sm">
@@ -109,6 +128,12 @@ export const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Settings Panel */}
+      <SettingsPanel 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+      />
     </header>
   );
 };

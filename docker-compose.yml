@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  hardhat-node:
+    build: .
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app/contracts
+      - ./scripts:/app/scripts
+    environment:
+      - NETWORK=localhost
+      - KAIROS_RPC_URL=${KAIROS_RPC_URL}
+    networks:
+      - kaia-network
+
+  monitoring:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - kaia-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    volumes:
+      - ./monitoring/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    networks:
+      - kaia-network
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - kaia-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=kaia_yield
+      - POSTGRES_USER=kaia
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - kaia-network
+
+  analytics:
+    build:
+      context: .
+      dockerfile: analytics/Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://kaia:${POSTGRES_PASSWORD}@postgres:5432/kaia_yield
+      - KAIROS_RPC_URL=${KAIROS_RPC_URL}
+    depends_on:
+      - postgres
+    networks:
+      - kaia-network
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  postgres_data:
+
+networks:
+  kaia-network:
+    driver: bridge

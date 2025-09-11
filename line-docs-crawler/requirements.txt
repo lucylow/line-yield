@@ -1,0 +1,9 @@
+scrapy==2.11.0
+scrapy-splash==0.8.0
+beautifulsoup4==4.12.2
+python-dateutil==2.8.2
+jsonlines==4.0.0
+tqdm==4.66.1
+html2text==2020.1.16
+lxml==4.9.3
+requests==2.31.0

@@ -76,32 +76,39 @@ export const Landing = () => {
 
       {/* Hero Section */}
       <section className="pt-40 pb-24 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-100 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+          <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-100 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{animationDelay: '4s'}}></div>
+        </div>
+        
         <div className="container mx-auto px-5">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-green-50 text-green-600 px-4 py-2 rounded-full text-sm font-semibold mb-5 animate-fade-in">
-                <i className="fas fa-bolt"></i>
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 text-green-600 px-6 py-3 rounded-full text-sm font-semibold mb-6 animate-bounce-in border border-green-200 shadow-lg">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span>Powered by Kaia Blockchain</span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight animate-fade-in animate-delay-1">
-                <span className="bg-gradient-to-r from-green-800 to-green-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight animate-slide-in-left">
+                <span className="bg-gradient-to-r from-green-800 via-green-600 to-emerald-500 bg-clip-text text-transparent animate-gradient-shift">
                   Earn Automated Yield on Your USDT
                 </span>
                 <br />
-                While You Chat
+                <span className="text-gray-800">While You Chat</span>
               </h1>
               
-              <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-fade-in animate-delay-1">
+              <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-slide-in-left animate-delay-1">
                 LINE Yield lets you maximize your stablecoin earnings through automated DeFi strategies, 
                 directly within LINE Messenger. Set it and forget it.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 mb-10 animate-fade-in animate-delay-2 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 mb-10 animate-slide-in-left animate-delay-2 justify-center lg:justify-start">
                 <Button 
                   size="lg" 
                   onClick={handleGetStarted}
-                  className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 animate-glow-pulse hover:animate-none"
                 >
                   <i className="fas fa-rocket mr-2"></i>
                   Start Earning Now
@@ -109,23 +116,23 @@ export const Landing = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="h-14 px-8 text-lg font-semibold border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-300"
+                  className="h-14 px-8 text-lg font-semibold border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-300 hover:shadow-lg"
                 >
                   <PlayCircle className="w-5 h-5 mr-2" />
                   Watch Demo
                 </Button>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 animate-fade-in animate-delay-3 max-w-md mx-auto lg:mx-0">
-                <div className="text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 animate-slide-in-left animate-delay-3 max-w-md mx-auto lg:mx-0">
+                <div className="text-center bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-green-100 hover:shadow-lg transition-all duration-300">
                   <div className="text-3xl font-extrabold text-green-800 mb-2">8.64%</div>
                   <div className="text-sm text-gray-600">Average APY</div>
                 </div>
-                <div className="text-center">
+                <div className="text-center bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-green-100 hover:shadow-lg transition-all duration-300">
                   <div className="text-3xl font-extrabold text-green-800 mb-2">$12.4M</div>
                   <div className="text-sm text-gray-600">Total Value Locked</div>
                 </div>
-                <div className="text-center">
+                <div className="text-center bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-green-100 hover:shadow-lg transition-all duration-300">
                   <div className="text-3xl font-extrabold text-green-800 mb-2">24/7</div>
                   <div className="text-sm text-gray-600">Auto-Rebalancing</div>
                 </div>
@@ -133,35 +140,36 @@ export const Landing = () => {
             </div>
             
             <div className="flex-1 w-full max-w-lg">
-              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-2xl animate-scale-in animate-delay-2">
-                <div className="flex justify-between items-center mb-5">
+              <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl animate-scale-in animate-delay-2 border border-white/20 hover:shadow-3xl transition-all duration-500">
+                <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg md:text-xl font-bold text-gray-800">Your Yield Dashboard</h3>
-                  <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 animate-pulse">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                     Live
                   </div>
                 </div>
                 
-                <div className="text-center mb-5">
+                <div className="text-center mb-6">
                   <div className="text-sm text-gray-600 mb-2">Total Balance</div>
                   <div className="text-3xl md:text-4xl font-extrabold text-green-800 mb-2">$12,458.90</div>
-                  <div className="text-green-600 font-semibold flex items-center justify-center gap-1">
+                  <div className="text-green-600 font-semibold flex items-center justify-center gap-1 bg-green-50 px-3 py-1 rounded-full">
                     <ArrowUp className="w-4 h-4" />
-                    2.4% ($298.21)
+                    +2.4% ($298.21)
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 hover:border-green-600 hover:bg-green-50 transition-all duration-300 cursor-pointer">
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="w-6 h-6 bg-green-600 rounded-md flex items-center justify-center text-white">
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="p-4 border border-gray-200 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:from-green-50 hover:to-green-100 hover:border-green-400 transition-all duration-300 cursor-pointer group">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
                         <ArrowDown className="w-4 h-4" />
                       </div>
                       <div className="text-sm font-semibold text-gray-800">Deposit</div>
                     </div>
                   </div>
-                  <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 hover:border-green-600 hover:bg-green-50 transition-all duration-300 cursor-pointer">
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="w-6 h-6 bg-green-600 rounded-md flex items-center justify-center text-white">
+                  <div className="p-4 border border-gray-200 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:from-green-50 hover:to-green-100 hover:border-green-400 transition-all duration-300 cursor-pointer group">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
                         <ArrowUp className="w-4 h-4" />
                       </div>
                       <div className="text-sm font-semibold text-gray-800">Withdraw</div>
@@ -169,9 +177,13 @@ export const Landing = () => {
                   </div>
                 </div>
                 
-                <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 p-4 rounded-xl text-white text-center">
-                  <div className="text-sm mb-1">Current APY</div>
-                  <div className="text-2xl font-extrabold">8.64%</div>
+                <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 p-6 rounded-2xl text-white text-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
+                  <div className="relative z-10">
+                    <div className="text-sm mb-1 opacity-90">Current APY</div>
+                    <div className="text-3xl font-extrabold">8.64%</div>
+                    <div className="text-xs mt-1 opacity-80">Auto-compounded daily</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -191,44 +203,44 @@ export const Landing = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-slide-up relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
-              <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600 text-2xl">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 animate-slide-up group border border-white/20">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 rounded-t-3xl"></div>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mb-6 text-green-600 text-2xl group-hover:scale-110 transition-transform duration-300">
                 <i className="fas fa-bolt"></i>
               </div>
               <h3 className="text-2xl font-bold mb-4 text-gray-800">Gasless Transactions</h3>
-              <p className="text-gray-600 leading-relaxed mb-5">
+              <p className="text-gray-600 leading-relaxed mb-6">
                 Enjoy zero transaction fees with our gas abstraction technology. We sponsor all gas costs for your deposits and withdrawals.
               </p>
-              <a href="#" className="inline-flex items-center gap-2 text-green-600 font-semibold text-sm hover:gap-3 transition-all duration-300">
+              <a href="#" className="inline-flex items-center gap-2 text-green-600 font-semibold text-sm hover:gap-3 transition-all duration-300 group-hover:text-emerald-600">
                 Learn more <ArrowRight className="w-4 h-4" />
               </a>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-slide-up animate-delay-1 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
-              <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600 text-2xl">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 animate-slide-up animate-delay-1 group border border-white/20">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 rounded-t-3xl"></div>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mb-6 text-green-600 text-2xl group-hover:scale-110 transition-transform duration-300">
                 <i className="fas fa-robot"></i>
               </div>
               <h3 className="text-2xl font-bold mb-4 text-gray-800">Auto-Rebalancing</h3>
-              <p className="text-gray-600 leading-relaxed mb-5">
+              <p className="text-gray-600 leading-relaxed mb-6">
                 Our smart contracts automatically move your funds to the highest-yielding strategies across the Kaia ecosystem.
               </p>
-              <a href="#" className="inline-flex items-center gap-2 text-green-600 font-semibold text-sm hover:gap-3 transition-all duration-300">
+              <a href="#" className="inline-flex items-center gap-2 text-green-600 font-semibold text-sm hover:gap-3 transition-all duration-300 group-hover:text-emerald-600">
                 Learn more <ArrowRight className="w-4 h-4" />
               </a>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-slide-up animate-delay-2 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
-              <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600 text-2xl">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 animate-slide-up animate-delay-2 group border border-white/20">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-600 rounded-t-3xl"></div>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mb-6 text-green-600 text-2xl group-hover:scale-110 transition-transform duration-300">
                 <i className="fas fa-shield-alt"></i>
               </div>
               <h3 className="text-2xl font-bold mb-4 text-gray-800">Secure & Audited</h3>
-              <p className="text-gray-600 leading-relaxed mb-5">
+              <p className="text-gray-600 leading-relaxed mb-6">
                 All smart contracts are thoroughly audited and built with security as the top priority. Your funds are always safe.
               </p>
-              <a href="#" className="inline-flex items-center gap-2 text-green-600 font-semibold text-sm hover:gap-3 transition-all duration-300">
+              <a href="#" className="inline-flex items-center gap-2 text-green-600 font-semibold text-sm hover:gap-3 transition-all duration-300 group-hover:text-emerald-600">
                 Learn more <ArrowRight className="w-4 h-4" />
               </a>
             </div>

@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - 'alert.rules.yml'
+
+scrape_configs:
+  - job_name: 'kaia-yield-node'
+    static_configs:
+      - targets: ['hardhat-node:8545']
+    metrics_path: '/metrics'
+    
+  - job_name: 'kaia-blockchain'
+    static_configs:
+      - targets: ['api.baobab.klaytn.net:8651']
+    metrics_path: '/'
+    
+  - job_name: 'frontend'
+    static_configs:
+      - targets: ['app.kaia-yield.xyz']
+    metrics_path: '/metrics'
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    metrics_path: '/metrics'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']

@@ -1,0 +1,56 @@
+groups:
+- name: kaia-yield-alerts
+  rules:
+  - alert: HighGasPrice
+    expr: avg(eth_gasPrice) > 100000000000 # 100 Gwei
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High gas price detected"
+      description: "Average gas price is above 100 Gwei for 5 minutes"
+  
+  - alert: LowTVL
+    expr: kaia_yield_tvl < 1000000000000000000000000 # $1M
+    for: 1h
+    labels:
+      severity: critical
+    annotations:
+      summary: "Low TVL alert"
+      description: "TVL has dropped below $1M for 1 hour"
+  
+  - alert: APIErrorRateHigh
+    expr: rate(api_errors_total[5m]) > 0.1
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High API error rate"
+      description: "API error rate is above 10% for 5 minutes"
+
+  - alert: DatabaseConnectionLost
+    expr: up{job="postgres"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Database connection lost"
+      description: "PostgreSQL database is not responding"
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage is above 90% for 5 minutes"
+
+  - alert: LowAPY
+    expr: kaia_yield_apy < 5
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low APY detected"
+      description: "Current APY is below 5% for 1 hour"
