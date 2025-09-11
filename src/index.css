@@ -6,22 +6,35 @@
 
 @layer base {
   :root {
+    /* LINE Yield Sophisticated Green & White Theme */
+    --line-green: 142 76% 36%; /* #06C755 */
+    --deep-forest: 142 85% 15%; /* #044C29 */
+    --emerald-start: 172 100% 39%; /* #00C896 */
+    --emerald-end: 142 100% 50%; /* #00FF85 */
+    --dark-navy: 217 91% 16%; /* #0A2540 */
+    --gold-accent: 51 100% 50%; /* #FFD700 */
+    
     /* App Background & Structure */
-    --background: 246 246 250; /* Light gray-blue */
-    --foreground: 213 30% 13%;
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 213 30% 13%; /* Dark text */
 
     /* Cards & Surfaces */
-    --card: 0 0% 100%;
+    --card: 0 0% 100%; /* White cards */
     --card-foreground: 213 30% 13%;
-    --card-shadow: 220 30% 5% / 0.08;
+    --card-shadow: 0 20px 40px hsl(0 0% 0% / 0.1);
 
-    /* DeFi Primary - Deep Blue for Trust */
-    --primary: 217 91% 16%; /* Deep blue */
+    /* Primary - LINE Green */
+    --primary: 142 76% 36%; /* LINE Green */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 35%;
+    --primary-glow: 142 76% 50%;
+
+    /* Secondary - Emerald Gradient */
+    --secondary: 172 100% 39%; /* Emerald start */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-end: 142 100% 50%; /* Emerald end */
 
     /* Yield Green - For Profits & Growth */
-    --yield: 142 76% 36%; /* Success green */
+    --yield: 142 76% 36%; /* LINE Green */
     --yield-foreground: 0 0% 100%;
     --yield-light: 142 69% 58%;
     --yield-bg: 142 76% 96%;
@@ -31,18 +44,16 @@
     --warning-foreground: 0 0% 100%;
     --warning-light: 38 92% 75%;
 
-    /* Secondary & Muted */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 213 30% 13%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 215 20% 55%;
+    /* Muted Colors */
+    --muted: 220 14% 96%; /* Light gray */
+    --muted-foreground: 215 20% 55%; /* Mid gray */
 
     /* Interactive Elements */
-    --accent: 217 91% 95%;
-    --accent-foreground: 217 91% 16%;
-    --border: 220 13% 91%;
+    --accent: 142 76% 95%; /* Light green accent */
+    --accent-foreground: 142 76% 36%;
+    --border: 220 13% 91%; /* Light border */
     --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    --ring: 142 76% 60%;
 
     /* Status Colors */
     --destructive: 0 84% 60%;
@@ -50,19 +61,21 @@
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 16%), hsl(217 91% 35%));
+    /* Sophisticated Gradients */
+    --gradient-primary: linear-gradient(90deg, hsl(172 100% 39%), hsl(142 100% 50%));
     --gradient-yield: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 69% 58%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 16%), hsl(217 91% 35%), hsl(142 76% 36%));
+    --gradient-hero: linear-gradient(90deg, hsl(142 85% 15%), hsl(142 76% 36%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 14% 98%));
+    --gradient-dark: linear-gradient(90deg, hsl(142 85% 15%), hsl(217 91% 16%));
 
-    /* Shadows */
-    --shadow-card: 0 4px 6px -1px hsl(220 30% 5% / 0.08);
-    --shadow-lg: 0 10px 25px -3px hsl(220 30% 5% / 0.12);
-    --shadow-yield: 0 8px 32px hsl(142 76% 36% / 0.2);
-    --shadow-primary: 0 8px 32px hsl(217 91% 16% / 0.2);
+    /* Enhanced Shadows */
+    --shadow-card: 0 10px 25px hsl(0 0% 0% / 0.05);
+    --shadow-lg: 0 15px 35px hsl(0 0% 0% / 0.1);
+    --shadow-yield: 0 8px 20px hsl(142 76% 36% / 0.3);
+    --shadow-primary: 0 6px 16px hsl(142 76% 36% / 0.4);
+    --shadow-emerald: 0 4px 8px hsl(172 100% 39% / 0.3);
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     /* Popover styles */
     --popover: 0 0% 100%;
@@ -116,7 +129,7 @@
   }
 }
 
-/* Custom animations */
+/* Sophisticated animations */
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 0 0 hsl(var(--yield) / 0.4); }
   50% { box-shadow: 0 0 20px 8px hsl(var(--yield) / 0.1); }
@@ -128,8 +141,23 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 @layer base {
@@ -138,7 +166,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   /* Gradient utilities */
@@ -158,17 +187,37 @@
     background: var(--gradient-card);
   }
 
-  /* Animation utilities */
+  /* Sophisticated Animation utilities */
   .animate-slide-up {
-    animation: slide-up 0.5s ease-out;
+    animation: slide-up 0.6s ease-out;
   }
 
   .animate-fade-in {
-    animation: fade-in 0.3s ease-out;
+    animation: fade-in 0.6s ease-out;
   }
 
   .animate-pulse-glow {
     animation: pulse-glow 2s infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.6s ease-out;
+  }
+
+  .animate-delay-1 {
+    animation-delay: 0.2s;
+  }
+
+  .animate-delay-2 {
+    animation-delay: 0.4s;
+  }
+
+  .animate-delay-3 {
+    animation-delay: 0.6s;
   }
 
   /* Shadow utilities */
