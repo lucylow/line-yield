@@ -16,8 +16,11 @@ contract MockAaveStrategy is IStrategy, Ownable {
     IERC20 public asset;
     uint256 public totalDeposited;
     uint256 public totalYield;
-    uint256 public constant APY = 520; // 5.2% APY in basis points
+    uint256 public baseAPY = 520; // 5.2% base APY in basis points
+    uint256 public currentAPY = 520; // Current APY (can fluctuate)
     bool public active = true;
+    uint256 public lastAPYUpdate;
+    uint256 public apyVolatility = 50; // ±0.5% volatility
     
     event Deposited(uint256 amount);
     event Withdrawn(uint256 amount);
@@ -51,8 +54,11 @@ contract MockAaveStrategy is IStrategy, Ownable {
     function harvest() external override onlyOwner returns (uint256) {
         if (totalDeposited == 0) return 0;
         
-        // Calculate yield based on APY (simplified daily calculation)
-        uint256 dailyYield = (totalDeposited * APY) / (10000 * 365);
+        // Update APY before calculating yield
+        this.updateAPY();
+        
+        // Calculate yield based on current APY (simplified daily calculation)
+        uint256 dailyYield = (totalDeposited * currentAPY) / (10000 * 365);
         totalYield += dailyYield;
         
         // Mint new tokens to simulate yield (in real implementation, this would come from lending)
@@ -66,7 +72,37 @@ contract MockAaveStrategy is IStrategy, Ownable {
     }
     
     function getAPY() external view override returns (uint256) {
-        return APY;
+        return currentAPY;
+    }
+    
+    function updateAPY() external {
+        // Simulate APY fluctuation based on market conditions
+        uint256 timeSinceUpdate = block.timestamp - lastAPYUpdate;
+        if (timeSinceUpdate >= 1 hours) {
+            // Generate pseudo-random APY fluctuation
+            uint256 randomFactor = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % (apyVolatility * 2);
+            int256 fluctuation = int256(randomFactor) - int256(apyVolatility);
+            
+            uint256 newAPY = uint256(int256(currentAPY) + fluctuation);
+            
+            // Ensure APY stays within reasonable bounds (1% to 15%)
+            if (newAPY < 100) newAPY = 100;
+            if (newAPY > 1500) newAPY = 1500;
+            
+            currentAPY = newAPY;
+            lastAPYUpdate = block.timestamp;
+        }
+    }
+    
+    function setAPY(uint256 _apy) external onlyOwner {
+        require(_apy >= 100 && _apy <= 1500, "APY out of bounds");
+        currentAPY = _apy;
+        lastAPYUpdate = block.timestamp;
+    }
+    
+    function setVolatility(uint256 _volatility) external onlyOwner {
+        require(_volatility <= 200, "Volatility too high");
+        apyVolatility = _volatility;
     }
     
     function emergencyWithdraw() external override onlyOwner {

@@ -14,7 +14,11 @@
     "deploy:testnet": "hardhat run scripts/deploy.ts --network kaiaTestnet",
     "deploy:mainnet": "hardhat run scripts/deploy.ts --network kaiaMainnet",
     "verify:testnet": "hardhat verify --network kaiaTestnet",
-    "verify:mainnet": "hardhat verify --network kaiaMainnet"
+    "verify:mainnet": "hardhat verify --network kaiaMainnet",
+    "security:audit": "node scripts/security-audit.js",
+    "security:test": "hardhat test test/Security.test.ts",
+    "update-docs": "node scripts/update-documentation.js",
+    "crawl-docs": "cd docs-crawler && python run_crawler.py"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -1,0 +1,34 @@
+{
+  "name": "line-yield-rebalancing-service",
+  "version": "1.0.0",
+  "description": "Auto-rebalancing service for LINE Yield Protocol",
+  "main": "rebalancing-service.js",
+  "scripts": {
+    "start": "node rebalancing-service.js",
+    "dev": "nodemon rebalancing-service.js",
+    "test": "jest",
+    "health-check": "node -e \"require('./rebalancing-service').healthCheck().then(console.log)\""
+  },
+  "dependencies": {
+    "web3": "^4.3.0",
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0"
+  },
+  "keywords": [
+    "defi",
+    "yield-farming",
+    "rebalancing",
+    "kaia",
+    "line-yield"
+  ],
+  "author": "LINE Yield Protocol",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

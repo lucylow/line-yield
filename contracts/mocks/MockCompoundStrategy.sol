@@ -7,20 +7,20 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IStrategy.sol";
 
 /**
- * @title MockKlaySwapStrategy
- * @dev Mock KlaySwap liquidity pool strategy for testing
+ * @title MockCompoundStrategy
+ * @dev Mock Compound lending strategy for testing
  */
-contract MockKlaySwapStrategy is IStrategy, Ownable {
+contract MockCompoundStrategy is IStrategy, Ownable {
     using SafeERC20 for IERC20;
     
     IERC20 public asset;
     uint256 public totalDeposited;
     uint256 public totalYield;
-    uint256 public baseAPY = 1250; // 12.5% base APY in basis points
-    uint256 public currentAPY = 1250; // Current APY (can fluctuate)
+    uint256 public baseAPY = 780; // 7.8% base APY in basis points
+    uint256 public currentAPY = 780; // Current APY (can fluctuate)
     bool public active = true;
     uint256 public lastAPYUpdate;
-    uint256 public apyVolatility = 100; // ±1% volatility (higher than Aave)
+    uint256 public apyVolatility = 75; // ±0.75% volatility
     
     event Deposited(uint256 amount);
     event Withdrawn(uint256 amount);
@@ -61,7 +61,7 @@ contract MockKlaySwapStrategy is IStrategy, Ownable {
         uint256 dailyYield = (totalDeposited * currentAPY) / (10000 * 365);
         totalYield += dailyYield;
         
-        // Mint new tokens to simulate yield (in real implementation, this would come from LP rewards)
+        // Mint new tokens to simulate yield (in real implementation, this would come from lending)
         // For testing, we'll just return the calculated yield
         emit Harvested(dailyYield);
         return dailyYield;
@@ -85,9 +85,9 @@ contract MockKlaySwapStrategy is IStrategy, Ownable {
             
             uint256 newAPY = uint256(int256(currentAPY) + fluctuation);
             
-            // Ensure APY stays within reasonable bounds (5% to 25%)
-            if (newAPY < 500) newAPY = 500;
-            if (newAPY > 2500) newAPY = 2500;
+            // Ensure APY stays within reasonable bounds (3% to 12%)
+            if (newAPY < 300) newAPY = 300;
+            if (newAPY > 1200) newAPY = 1200;
             
             currentAPY = newAPY;
             lastAPYUpdate = block.timestamp;
@@ -95,13 +95,13 @@ contract MockKlaySwapStrategy is IStrategy, Ownable {
     }
     
     function setAPY(uint256 _apy) external onlyOwner {
-        require(_apy >= 500 && _apy <= 2500, "APY out of bounds");
+        require(_apy >= 300 && _apy <= 1200, "APY out of bounds");
         currentAPY = _apy;
         lastAPYUpdate = block.timestamp;
     }
     
     function setVolatility(uint256 _volatility) external onlyOwner {
-        require(_volatility <= 300, "Volatility too high");
+        require(_volatility <= 200, "Volatility too high");
         apyVolatility = _volatility;
     }
     
