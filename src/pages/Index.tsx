@@ -1,148 +1,207 @@
-import { motion } from "framer-motion";
-import { ArrowRight, Command } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Navigation from "@/components/Navigation";
-import { FeaturesSection } from "@/components/features/FeaturesSection";
-import { PricingSection } from "@/components/pricing/PricingSection";
-import LogoCarousel from "@/components/LogoCarousel";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import Footer from "@/components/Footer";
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import React, { useState } from 'react';
+import { useWallet } from '../hooks/useWallet';
+import { useVault } from '../hooks/useVault';
+import { BalanceCard } from '../components/BalanceCard';
+import { StrategyAllocation } from '../components/StrategyAllocation';
+import { TransactionModal } from '../components/TransactionModal';
+import { Button } from '@/components/ui/button';
+import { VAULT_ADDRESS } from '../utils/constants';
+import { ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, DollarSign, Percent } from 'lucide-react';
 
-const Index = () => {
+const Dashboard = () => {
+  const { wallet } = useWallet();
+  const { vaultData, isLoading, deposit, withdraw, isDepositing, isWithdrawing } = 
+    useVault(VAULT_ADDRESS);
+  
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+
+  if (!wallet.isConnected) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Please connect your wallet</h1>
+          <p className="text-muted-foreground">You need to connect your wallet to access the dashboard</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black text-foreground">
-      <Navigation />
-      
-      {/* Hero Section */}
-      <motion.section 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative container px-4 pt-40 pb-20"
-      >
-        {/* Background */}
-        <div 
-          className="absolute inset-0 -z-10 bg-[#0A0A0A]"
-        />
-        
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="inline-block mb-4 px-4 py-1.5 rounded-full glass"
-        >
-          <span className="text-sm font-medium">
-            <Command className="w-4 h-4 inline-block mr-2" />
-            Next-gen crypto trading platform
-          </span>
-        </motion.div>
-        
-        <div className="max-w-4xl relative z-10">
-          <h1 className="text-5xl md:text-7xl font-normal mb-4 tracking-tight text-left">
-            <span className="text-gray-200">
-              <TextGenerateEffect words="Trade crypto with" />
-            </span>
-            <br />
-            <span className="text-white font-medium">
-              <TextGenerateEffect words="confidence & security" />
-            </span>
-          </h1>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        {/* Dashboard Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 animate-fade-in">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+            <p className="text-muted-foreground">Manage your USDT investments and track your earnings</p>
+          </div>
           
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl text-left"
-          >
-            Experience seamless cryptocurrency trading with advanced features, real-time analytics, and institutional-grade security.{" "}
-            <span className="text-white">Start trading in minutes.</span>
-          </motion.p>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 items-start"
-          >
-            <Button size="lg" className="button-gradient">
-              Start Trading Now
-            </Button>
-            <Button size="lg" variant="link" className="text-white">
-              View Markets <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-          </motion.div>
+          <div className="flex items-center gap-3 bg-card/60 backdrop-blur-sm border border-border rounded-xl px-4 py-3">
+            <div className="text-right">
+              <p className="text-sm font-medium text-foreground">
+                {wallet.address?.slice(0, 6)}...{wallet.address?.slice(-4)}
+              </p>
+              <p className="text-xs text-muted-foreground">Balance: {wallet.balance} USDT</p>
+            </div>
+            <div className="w-3 h-3 bg-yield rounded-full animate-pulse"></div>
+          </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="relative mx-auto max-w-5xl mt-20"
-        >
-          <div className="glass rounded-xl overflow-hidden">
-            <img
-              src="/lovable-uploads/c32c6788-5e4a-4fee-afee-604b03113c7f.png"
-              alt="CryptoTrade Dashboard"
-              className="w-full h-auto"
-            />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-card rounded-2xl p-6 shadow-lg border animate-slide-up">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Balance</p>
+                <p className="text-2xl font-bold text-foreground">
+                  ${vaultData?.userAssets || '0.00'}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Wallet className="w-6 h-6 text-primary" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-secondary">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm font-medium">2.4% this month</span>
+            </div>
           </div>
-        </motion.div>
-      </motion.section>
 
-      {/* Logo Carousel */}
-      <LogoCarousel />
+          <div className="bg-card rounded-2xl p-6 shadow-lg border animate-slide-up">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Current APY</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {vaultData?.apy || '8.64'}%
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-yield/10 rounded-xl flex items-center justify-center">
+                <Percent className="w-6 h-6 text-yield" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-secondary">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm font-medium">0.32% from yesterday</span>
+            </div>
+          </div>
 
-      {/* Features Section */}
-      <div id="features" className="bg-black">
-        <FeaturesSection />
-      </div>
+          <div className="bg-card rounded-2xl p-6 shadow-lg border animate-slide-up">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Earned This Month</p>
+                <p className="text-2xl font-bold text-foreground">$186.42</p>
+              </div>
+              <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-secondary" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-secondary">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm font-medium">14% vs last month</span>
+            </div>
+          </div>
+        </div>
 
-      {/* Pricing Section */}
-      <div id="pricing" className="bg-black">
-        <PricingSection />
-      </div>
+        {/* Action Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-card rounded-2xl p-6 shadow-lg border animate-slide-up">
+            <h3 className="text-xl font-semibold mb-6">Deposit USDT</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Amount to Deposit</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                  <span className="absolute right-3 top-3 text-sm text-muted-foreground">USDT</span>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button 
+                  className="flex-1" 
+                  onClick={() => setIsDepositModalOpen(true)}
+                  disabled={isDepositing}
+                >
+                  <ArrowUpRight className="w-4 h-4 mr-2" />
+                  Deposit
+                </Button>
+                <Button variant="outline" className="px-6">
+                  Max
+                </Button>
+              </div>
+            </div>
+          </div>
 
-      {/* Testimonials Section */}
-      <div className="bg-black">
-        <TestimonialsSection />
-      </div>
+          <div className="bg-card rounded-2xl p-6 shadow-lg border animate-slide-up">
+            <h3 className="text-xl font-semibold mb-6">Withdraw USDT</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Amount to Withdraw</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                  <span className="absolute right-3 top-3 text-sm text-muted-foreground">USDT</span>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button 
+                  className="flex-1" 
+                  onClick={() => setIsWithdrawModalOpen(true)}
+                  disabled={isWithdrawing}
+                >
+                  <ArrowDownLeft className="w-4 h-4 mr-2" />
+                  Withdraw
+                </Button>
+                <Button variant="outline" className="px-6">
+                  Max
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      {/* CTA Section */}
-      <section className="container px-4 py-20 relative bg-black">
-        <div 
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage: 'url("/lovable-uploads/21f3edfb-62b5-4e35-9d03-7339d803b980.png")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
+        {/* Balance Card */}
+        {!isLoading && vaultData && (
+          <div className="animate-slide-up mb-8">
+            <BalanceCard vaultData={vaultData} isLoading={isLoading} />
+          </div>
+        )}
+
+        {/* Strategy Allocation */}
+        {vaultData?.strategies && vaultData.strategies.length > 0 && (
+          <div className="animate-slide-up">
+            <StrategyAllocation strategies={vaultData.strategies} />
+          </div>
+        )}
+
+        {/* Transaction Modals */}
+        <TransactionModal
+          isOpen={isDepositModalOpen}
+          onClose={() => setIsDepositModalOpen(false)}
+          type="deposit"
+          onSubmit={deposit}
+          maxAmount={wallet.balance}
+          isLoading={isDepositing}
+          currentApy={vaultData?.apy}
         />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-[#0A0A0A]/80 backdrop-blur-lg border border-white/10 rounded-2xl p-8 md:p-12 text-center relative z-10"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to start trading?
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of traders who have already discovered the power of our platform.
-          </p>
-          <Button size="lg" className="button-gradient">
-            Create Account
-            <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-        </motion.div>
-      </section>
 
-      {/* Footer */}
-      <div className="bg-black">
-        <Footer />
+        <TransactionModal
+          isOpen={isWithdrawModalOpen}
+          onClose={() => setIsWithdrawModalOpen(false)}
+          type="withdraw"
+          onSubmit={withdraw}
+          maxAmount={vaultData?.userAssets || '0'}
+          isLoading={isWithdrawing}
+        />
       </div>
     </div>
   );
 };
 
-export default Index;
+export default Dashboard;
