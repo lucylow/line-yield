@@ -33,7 +33,7 @@ export const useWallet = () => {
         throw new Error('No Ethereum wallet found. Please install MetaMask or another Web3 wallet.');
       }
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
       });

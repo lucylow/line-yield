@@ -8,7 +8,7 @@ export const formatCurrency = (value: number, decimals: number = 2): string => {
 };
 
 export const formatBalance = (balance: ethers.BigNumberish, decimals: number = 4): string => {
-  const formatted = ethers.utils.formatUnits(balance, 6); // USDT has 6 decimals
+  const formatted = ethers.formatUnits(balance, 6); // USDT has 6 decimals
   return formatCurrency(parseFloat(formatted), decimals);
 };
 

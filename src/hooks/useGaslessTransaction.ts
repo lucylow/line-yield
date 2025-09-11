@@ -156,7 +156,7 @@ export const createGaslessSignature = async (
     )
   );
 
-  const signature = await signer.signMessage(ethers.getBytes(messageHash));
+  const signature = await signer.signMessage(ethers.toUtf8Bytes(messageHash));
   return signature;
 };
 
