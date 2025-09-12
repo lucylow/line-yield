@@ -6,7 +6,7 @@ export interface WalletConnectionOptions {
 }
 
 export class WalletService {
-  private provider: ethers.BrowserProvider | null = null;
+  private provider: ethers.providers.Web3Provider | null = null;
 
   async connect(options: WalletConnectionOptions): Promise<string | null> {
     try {
@@ -27,7 +27,7 @@ export class WalletService {
       throw new Error('MetaMask not installed');
     }
 
-    this.provider = new ethers.BrowserProvider(window.ethereum);
+    this.provider = new ethers.providers.Web3Provider(window.ethereum);
     
     // Request account access
     const accounts = await window.ethereum.request({
@@ -86,7 +86,7 @@ export class WalletService {
     });
   }
 
-  getProvider(): ethers.BrowserProvider | null {
+  getProvider(): ethers.providers.Web3Provider | null {
     return this.provider;
   }
 
@@ -96,10 +96,10 @@ export class WalletService {
     }
     
     const balance = await this.provider.getBalance(address);
-    return ethers.formatEther(balance);
+    return ethers.utils.formatEther(balance);
   }
 
-  async getNetwork(): Promise<ethers.Network> {
+  async getNetwork(): Promise<ethers.providers.Network> {
     if (!this.provider) {
       throw new Error('Provider not initialized');
     }

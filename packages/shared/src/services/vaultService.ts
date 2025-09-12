@@ -18,10 +18,10 @@ export interface TransactionData {
 }
 
 export class VaultService {
-  private provider: ethers.BrowserProvider | null;
+  private provider: ethers.providers.Web3Provider | null;
   private contractAddress: string;
 
-  constructor(provider: ethers.BrowserProvider | null) {
+  constructor(provider: ethers.providers.Web3Provider | null) {
     this.provider = provider;
     // This would be your deployed vault contract address
     this.contractAddress = process.env.VITE_VAULT_CONTRACT_ADDRESS || '0x742d35Cc6634C0532925a3b8D8C8d6C7B8b8b8b8';
@@ -61,7 +61,7 @@ export class VaultService {
 
     try {
       // Convert amount to wei
-      const amountWei = ethers.parseEther(amount);
+      const amountWei = ethers.utils.parseEther(amount);
 
       // Mock transaction data
       // In a real implementation, this would encode the deposit function call
@@ -87,7 +87,7 @@ export class VaultService {
 
     try {
       // Convert amount to wei
-      const amountWei = ethers.parseEther(amount);
+      const amountWei = ethers.utils.parseEther(amount);
 
       // Mock transaction data
       // In a real implementation, this would encode the withdraw function call
