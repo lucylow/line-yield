@@ -10,8 +10,12 @@ import { PerformanceMonitor } from "./components/PerformanceMonitor";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Index";
 import LineYieldApp from "./pages/LineYieldApp";
+import LineMiniDapp from "./pages/LineMiniDapp";
+import WebMiniDapp from "./pages/WebMiniDapp";
+import MiniDappDemo from "./pages/MiniDappDemo";
 import SecurityAudit from "./pages/SecurityAudit";
 import NotFound from "./pages/NotFound";
+import { LiffProvider } from "./hooks/useLiff";
 import { useAnalytics } from "./hooks/useAnalytics";
 import { useGlobalErrorHandler } from "./hooks/useErrorHandler";
 
@@ -65,6 +69,29 @@ const AppContent = () => {
               <Header />
               <main className="flex-1">
                 <LineYieldApp />
+              </main>
+              <Footer />
+            </div>
+          } />
+          <Route path="/line-mini-dapp" element={
+            <LiffProvider>
+              <LineMiniDapp />
+            </LiffProvider>
+          } />
+          <Route path="/web-mini-dapp" element={
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                <WebMiniDapp />
+              </main>
+              <Footer />
+            </div>
+          } />
+          <Route path="/mini-dapp-demo" element={
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                <MiniDappDemo />
               </main>
               <Footer />
             </div>

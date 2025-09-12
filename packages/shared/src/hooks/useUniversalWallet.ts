@@ -9,7 +9,7 @@ interface WalletState {
   address: string | null;
   balance: string;
   chainId: number | null;
-  provider: ethers.BrowserProvider | null;
+  provider: ethers.providers.Web3Provider | null;
   walletType: string | null;
 }
 
@@ -55,8 +55,8 @@ export const useUniversalWallet = () => {
       const newWalletState = {
         isConnected: true,
         address,
-        balance: ethers.formatEther(balance),
-        chainId: Number(network.chainId),
+        balance: ethers.utils.formatEther(balance),
+        chainId: network.chainId,
         provider,
         walletType
       };
