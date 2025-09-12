@@ -17,7 +17,7 @@ import {
   History,
   Settings,
   ChevronRight,
-  Gas,
+  Fuel,
   Clock,
   CheckCircle
 } from 'lucide-react';
@@ -126,8 +126,8 @@ const LineYieldApp: React.FC = () => {
             
             <div className="space-y-4 mb-8">
               <div className="flex items-center gap-3 text-sm text-gray-600">
-                <Gas className="w-4 h-4 text-green-500" />
-                <span>Gasless transactions</span>
+                <Fuel className="w-4 h-4 text-green-500" />
+                <span>Fuelless transactions</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-gray-600">
                 <Shield className="w-4 h-4 text-green-500" />
