@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useWallet } from '../hooks/useWallet';
-import { useVault } from '../hooks/useVault';
+import { useSupabaseVault } from '../hooks/useSupabaseVault';
+import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
 import { BalanceCard } from '../components/BalanceCard';
 import { StrategyAllocation } from '../components/StrategyAllocation';
 import { TransactionModal } from '../components/TransactionModal';
 import { TransactionHistory } from '../components/TransactionHistory';
 import { NotificationsPanel } from '../components/NotificationsPanel';
 import { LoadingCard, LoadingSpinner } from '../components/LoadingSpinner';
+import { AuthModal } from '../components/AuthModal';
 import { KaiaApiTest } from '../components/KaiaApiTest';
 import { Button } from '@/components/ui/button';
 import { VAULT_ADDRESS } from '../utils/constants';
@@ -14,6 +16,7 @@ import { ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, DollarSign, Percent, R
 
 const Dashboard = () => {
   const { wallet } = useWallet();
+  const { isAuthenticated } = useSupabaseAuth();
   const { 
     vaultData, 
     isLoading, 
@@ -25,7 +28,7 @@ const Dashboard = () => {
     isWithdrawing,
     refreshVaultData,
     refreshTransactionHistory
-  } = useVault(VAULT_ADDRESS);
+  } = useSupabaseVault();
   
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -35,21 +38,21 @@ const Dashboard = () => {
     refreshTransactionHistory();
   };
 
-  if (!wallet.isConnected) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center p-4">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20 text-center max-w-md w-full animate-scale-in">
           <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
             <Wallet className="w-10 h-10 text-green-600" />
           </div>
-          <h1 className="text-2xl font-bold mb-4 text-gray-800">Connect Your Wallet</h1>
-          <p className="text-muted-foreground mb-6">Connect your wallet to access your yield dashboard and start earning</p>
+          <h1 className="text-2xl font-bold mb-4 text-gray-800">Welcome to LINE Yield</h1>
+          <p className="text-muted-foreground mb-6">Create an account to access your yield dashboard and start earning automated yield</p>
           <Button 
             onClick={() => window.location.href = '/'}
             className="w-full h-12 bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
           >
             <Wallet className="w-5 h-5 mr-2" />
-            Connect Wallet
+            Get Started
           </Button>
         </div>
       </div>

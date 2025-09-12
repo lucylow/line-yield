@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* LIFF-specific styles */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Touch-friendly styles for mobile */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* LINE theme colors */
+:root {
+  --line-green: #00c300;
+  --line-blue: #00bcd4;
+}

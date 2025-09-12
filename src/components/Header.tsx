@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LineChart, Wallet, Settings } from 'lucide-react';
+import { LineChart, Wallet, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWallet } from '@/hooks/useWallet';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { MobileNavigation } from './MobileNavigation';
 import { SettingsPanel } from './SettingsPanel';
+import { AuthModal } from './AuthModal';
 
 export const Header = () => {
   const { wallet, connectWallet } = useWallet();
+  const { user, signOut, isAuthenticated } = useSupabaseAuth();
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -95,25 +99,59 @@ export const Header = () => {
               <Settings className="w-4 h-4" />
             </Button>
 
-            {wallet.isConnected ? (
+            {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-2 shadow-sm">
+                <div className="flex items-center gap-2">
+                  {user?.avatarUrl ? (
+                    <img 
+                      src={user.avatarUrl} 
+                      alt="Profile" 
+                      className="w-8 h-8 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-green-600" />
+                    </div>
+                  )}
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-800">
-                      {wallet.address?.slice(0, 6)}...{wallet.address?.slice(-4)}
+                      {user?.displayName || user?.email?.split('@')[0]}
                     </p>
-                    <p className="text-xs text-gray-600">Kaia Network</p>
+                    <p className="text-xs text-gray-600">LINE Yield User</p>
                   </div>
                 </div>
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                
+                {wallet.isConnected && (
+                  <div className="flex items-center gap-2">
+                    <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-3 py-1 shadow-sm">
+                      <div className="text-right">
+                        <p className="text-xs font-medium text-gray-800">
+                          {wallet.address?.slice(0, 6)}...{wallet.address?.slice(-4)}
+                        </p>
+                        <p className="text-xs text-gray-600">Kaia Network</p>
+                      </div>
+                    </div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  </div>
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => signOut()}
+                  className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+                >
+                  Sign Out
+                </Button>
               </div>
             ) : (
-              <>
+              <div className="flex items-center gap-3">
                 <Button 
                   variant="outline" 
+                  onClick={() => setIsAuthModalOpen(true)}
                   className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-300"
                 >
-                  <i className="fas fa-sign-in-alt mr-2"></i>
+                  <User className="w-4 h-4 mr-2" />
                   Sign In
                 </Button>
                 <Button 
@@ -123,7 +161,7 @@ export const Header = () => {
                   <Wallet className="w-4 h-4 mr-2" />
                   Connect Wallet
                 </Button>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -133,6 +171,12 @@ export const Header = () => {
       <SettingsPanel 
         isOpen={isSettingsOpen} 
         onClose={() => setIsSettingsOpen(false)} 
+      />
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
       />
     </header>
   );
