@@ -1,1 +1,4 @@
 project_id = "jkerdjwnxrkiwzqklspp"
+
+[functions.test-kaia-api]
+verify_jwt = false
