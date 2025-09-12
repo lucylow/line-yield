@@ -4,6 +4,7 @@ export interface WalletState {
   balance: string;
   network: string;
   provider: any;
+  signer?: any;
 }
 
 export interface WalletConnectOptions {

@@ -47,12 +47,13 @@ export const useWallet = () => {
       
       // Switch to Kaia network if needed
       const targetChainId = options?.chainId || KLAYTN_TESTNET.chainId;
-      if (network.chainId !== targetChainId) {
+      if (Number(network.chainId) !== targetChainId) {
         await switchNetwork(targetChainId);
       }
 
       // Get updated balance after network switch
       const balance = await provider.getBalance(address);
+      const signer = await provider.getSigner();
       
       setWallet({
         isConnected: true,
@@ -60,6 +61,7 @@ export const useWallet = () => {
         balance: formatBalance(balance),
         network: network.name,
         provider,
+        signer,
       });
 
       toast({
@@ -118,6 +120,7 @@ export const useWallet = () => {
       balance: '0',
       network: '',
       provider: null,
+      signer: null,
     });
     
     toast({

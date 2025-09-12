@@ -9,6 +9,13 @@ import { formatCurrency } from '../utils/formatters';
 import { ArrowUpRight, ArrowDownLeft, Info, Zap, CheckCircle, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+interface Step {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'completed' | 'current' | 'pending';
+}
+
 interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -72,7 +79,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   const Icon = isDeposit ? ArrowUpRight : ArrowDownLeft;
   const projectedYield = parseFloat(amount || '0') * currentApy;
 
-  const transactionSteps = [
+  const transactionSteps: Step[] = [
     {
       id: 'input',
       title: 'Enter Amount',
