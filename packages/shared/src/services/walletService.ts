@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BrowserProvider, formatEther } from 'ethers';
 
 export interface WalletConnectionOptions {
   type: 'metamask' | 'line' | 'walletconnect';
@@ -6,7 +6,7 @@ export interface WalletConnectionOptions {
 }
 
 export class WalletService {
-  private provider: ethers.providers.Web3Provider | null = null;
+  private provider: BrowserProvider | null = null;
 
   async connect(options: WalletConnectionOptions): Promise<string | null> {
     try {
@@ -27,7 +27,7 @@ export class WalletService {
       throw new Error('MetaMask not installed');
     }
 
-    this.provider = new ethers.providers.Web3Provider(window.ethereum);
+    this.provider = new BrowserProvider(window.ethereum);
     
     // Request account access
     const accounts = await window.ethereum.request({
@@ -86,7 +86,7 @@ export class WalletService {
     });
   }
 
-  getProvider(): ethers.providers.Web3Provider | null {
+  getProvider(): BrowserProvider | null {
     return this.provider;
   }
 
@@ -96,10 +96,10 @@ export class WalletService {
     }
     
     const balance = await this.provider.getBalance(address);
-    return ethers.utils.formatEther(balance);
+    return formatEther(balance);
   }
 
-  async getNetwork(): Promise<ethers.providers.Network> {
+  async getNetwork(): Promise<any> {
     if (!this.provider) {
       throw new Error('Provider not initialized');
     }

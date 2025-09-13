@@ -101,10 +101,12 @@ export class LineVerificationService {
   private readonly liffApiEndpoint = 'https://api.line.me/liff/v1/apps';
   private readonly richMenuEndpoint = 'https://api.line.me/v2/bot/richmenu';
 
+  private readonly providerId?: string;
+
   constructor(
     private readonly channelAccessToken: string,
     private readonly channelId: string,
-    private readonly providerId?: string
+    providerId?: string
   ) {
     if (!channelAccessToken) {
       throw new Error('Channel Access Token is required');
@@ -113,9 +115,12 @@ export class LineVerificationService {
       throw new Error('Channel ID is required');
     }
     
+    // Store provider ID for potential future use in verification
+    this.providerId = providerId;
+    
     // Log provider ID if available for debugging
-    if (providerId) {
-      Logger.debug(`Provider ID: ${providerId}`);
+    if (this.providerId) {
+      Logger.debug(`Provider ID: ${this.providerId}`);
     }
   }
 

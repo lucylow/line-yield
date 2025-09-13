@@ -2,8 +2,8 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { LiffProvider } from './providers/LiffProvider';
-import { Layout, Button } from '@line-yield/shared';
-import { useUniversalWallet, useLineYield } from '@line-yield/shared';
+import { Layout, Button } from '../../shared/src';
+import { useUniversalWallet, useLineYield } from '../../shared/src';
 import PaymentDemo from './components/PaymentDemo';
 
 const queryClient = new QueryClient();

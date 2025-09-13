@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ethers } from 'ethers';
+import { BrowserProvider, formatEther } from 'ethers';
 import { usePlatform } from './usePlatform';
 import { WalletService } from '../services/walletService';
 import { AccountService } from '../services/accountService';
@@ -9,7 +9,7 @@ interface WalletState {
   address: string | null;
   balance: string;
   chainId: number | null;
-  provider: ethers.providers.Web3Provider | null;
+  provider: BrowserProvider | null;
   walletType: string | null;
 }
 
@@ -55,7 +55,7 @@ export const useUniversalWallet = () => {
       const newWalletState = {
         isConnected: true,
         address,
-        balance: ethers.utils.formatEther(balance),
+        balance: formatEther(balance),
         chainId: network.chainId,
         provider,
         walletType

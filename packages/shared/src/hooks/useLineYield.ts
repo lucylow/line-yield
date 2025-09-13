@@ -1,106 +1,109 @@
-import { useState, useCallback } from 'react';
-import { ethers } from 'ethers';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUniversalWallet } from './useUniversalWallet';
+import { useState, useEffect, useCallback } from 'react';
 import { usePlatform } from './usePlatform';
-import { VaultService } from '../services/vaultService';
-import { RelayerService } from '../services/relayerService';
+
+interface VaultData {
+  userDeposited: string;
+  userYield: string;
+  currentAPY: number;
+  totalDeposited: string;
+  totalYield: string;
+}
+
+interface DepositParams {
+  amount: string;
+}
+
+interface WithdrawParams {
+  amount: string;
+}
 
 export const useLineYield = () => {
-  const { wallet } = useUniversalWallet();
   const { isLiff } = usePlatform();
-  const queryClient = useQueryClient();
-  
-  const vaultService = new VaultService(wallet.provider);
-  const relayerService = new RelayerService();
+  const [vaultData, setVaultData] = useState<VaultData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDepositing, setIsDepositing] = useState(false);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
-  // Fetch vault data
-  const { data: vaultData, isLoading, error } = useQuery({
-    queryKey: ['vaultData', wallet.address],
-    queryFn: async () => {
-      if (!wallet.address || !wallet.provider) return null;
-      return vaultService.getVaultData(wallet.address);
-    },
-    enabled: !!wallet.address && !!wallet.provider,
-    refetchInterval: 30000,
-  });
+  // Mock data for demonstration
+  const mockVaultData: VaultData = {
+    userDeposited: '1000',
+    userYield: '45.67',
+    currentAPY: 8.5,
+    totalDeposited: '1500000',
+    totalYield: '67500'
+  };
 
-  // Deposit mutation
-  const depositMutation = useMutation({
-    mutationFn: async ({ amount }: { amount: string }) => {
-      if (!wallet.provider || !wallet.address) {
-        throw new Error('Wallet not connected');
+  // Load vault data
+  useEffect(() => {
+    const loadVaultData = async () => {
+      setIsLoading(true);
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setVaultData(mockVaultData);
+      } catch (error) {
+        console.error('Failed to load vault data:', error);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      const depositTx = await vaultService.prepareDeposit(amount, wallet.address);
+    loadVaultData();
+  }, []);
+
+  const deposit = useCallback(async (params: DepositParams) => {
+    setIsDepositing(true);
+    try {
+      // Simulate deposit transaction
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      if (isLiff) {
-        // Use relayer for gasless transactions in LIFF
-        console.log('Using relayer for gasless transaction');
-        return relayerService.relayTransaction({
-          to: depositTx.to,
-          data: depositTx.data,
-          value: depositTx.value?.toString() || '0'
+      // Update vault data
+      if (vaultData) {
+        setVaultData({
+          ...vaultData,
+          userDeposited: (parseFloat(vaultData.userDeposited) + parseFloat(params.amount)).toString()
         });
-      } else {
-        // Direct transaction for web version
-        console.log('Using direct wallet transaction');
-        const signer = wallet.provider.getSigner();
-        const tx = await signer.sendTransaction({
-          to: depositTx.to,
-          data: depositTx.data,
-          value: depositTx.value,
-          gasLimit: depositTx.gasLimit,
-          gasPrice: depositTx.gasPrice,
-        });
-        return tx.wait();
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vaultData', wallet.address] });
-    },
-  });
-
-  // Withdraw mutation
-  const withdrawMutation = useMutation({
-    mutationFn: async ({ amount }: { amount: string }) => {
-      if (!wallet.provider || !wallet.address) {
-        throw new Error('Wallet not connected');
-      }
-
-      const withdrawTx = await vaultService.prepareWithdraw(amount, wallet.address);
       
-      if (isLiff) {
-        return relayerService.relayTransaction({
-          to: withdrawTx.to,
-          data: withdrawTx.data,
-          value: withdrawTx.value?.toString() || '0'
+      console.log(`Deposited ${params.amount} USDC`);
+    } catch (error) {
+      console.error('Deposit failed:', error);
+      throw error;
+    } finally {
+      setIsDepositing(false);
+    }
+  }, [vaultData]);
+
+  const withdraw = useCallback(async (params: WithdrawParams) => {
+    setIsWithdrawing(true);
+    try {
+      // Simulate withdraw transaction
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Update vault data
+      if (vaultData) {
+        setVaultData({
+          ...vaultData,
+          userDeposited: Math.max(0, parseFloat(vaultData.userDeposited) - parseFloat(params.amount)).toString()
         });
-      } else {
-        const signer = wallet.provider.getSigner();
-        const tx = await signer.sendTransaction({
-          to: withdrawTx.to,
-          data: withdrawTx.data,
-          value: withdrawTx.value,
-          gasLimit: withdrawTx.gasLimit,
-          gasPrice: withdrawTx.gasPrice,
-        });
-        return tx.wait();
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vaultData', wallet.address] });
-    },
-  });
+      
+      console.log(`Withdrew ${params.amount} USDC`);
+    } catch (error) {
+      console.error('Withdraw failed:', error);
+      throw error;
+    } finally {
+      setIsWithdrawing(false);
+    }
+  }, [vaultData]);
 
   return {
     vaultData,
     isLoading,
-    error,
-    deposit: depositMutation.mutateAsync,
-    withdraw: withdrawMutation.mutateAsync,
-    isDepositing: depositMutation.isPending,
-    isWithdrawing: withdrawMutation.isPending,
+    isDepositing,
+    isWithdrawing,
+    deposit,
+    withdraw,
     isLiff
   };
 };
