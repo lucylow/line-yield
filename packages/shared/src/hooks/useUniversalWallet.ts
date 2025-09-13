@@ -56,7 +56,7 @@ export const useUniversalWallet = () => {
         isConnected: true,
         address,
         balance: formatEther(balance),
-        chainId: network.chainId,
+        chainId: Number(network.chainId),
         provider,
         walletType
       };

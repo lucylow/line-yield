@@ -45,6 +45,8 @@ export interface AppConfig {
     jwtSecret: string;
     rateLimitWindowMs: number;
     rateLimitMaxRequests: number;
+    encryptionKey: string;
+    apiRateLimitSecret: string;
   };
   gasless: {
     enabled: boolean;
@@ -57,6 +59,15 @@ export interface AppConfig {
     channelId: string;
     providerId?: string;
     liffId?: string;
+  };
+  supabase: {
+    url: string;
+    serviceRoleKey: string;
+    anonKey: string;
+  };
+  lovable: {
+    clientSecret: string;
+    apiKey: string;
   };
 }
 
@@ -143,7 +154,9 @@ export const CONFIG: AppConfig = {
   security: {
     jwtSecret: process.env['JWT_SECRET'] || 'your-secret-key-change-in-production',
     rateLimitWindowMs: parseInt(process.env['RATE_LIMIT_WINDOW_MS'] || '60000'), // 1 minute
-    rateLimitMaxRequests: parseInt(process.env['RATE_LIMIT_MAX_REQUESTS'] || '100')
+    rateLimitMaxRequests: parseInt(process.env['RATE_LIMIT_MAX_REQUESTS'] || '100'),
+    encryptionKey: process.env['ENCRYPTION_KEY'] || '',
+    apiRateLimitSecret: process.env['API_RATE_LIMIT_SECRET'] || 'rate-limit-secret'
   },
   
   gasless: {
@@ -158,6 +171,17 @@ export const CONFIG: AppConfig = {
     channelId: process.env['LINE_CHANNEL_ID'] || '',
     providerId: process.env['LINE_PROVIDER_ID'],
     liffId: process.env['LINE_LIFF_ID']
+  },
+  
+  supabase: {
+    url: process.env['SUPABASE_URL'] || '',
+    serviceRoleKey: process.env['SUPABASE_SERVICE_ROLE_KEY'] || '',
+    anonKey: process.env['SUPABASE_ANON_KEY'] || ''
+  },
+  
+  lovable: {
+    clientSecret: process.env['LOVABLE_CLIENT_SECRET'] || '',
+    apiKey: process.env['LOVABLE_API_KEY'] || ''
   }
 };
 
@@ -166,13 +190,21 @@ export function validateConfig(): void {
   const requiredEnvVars = [
     'WALLET_PRIVATE_KEY',
     'VAULT_ADDRESS',
-    'STRATEGY_MANAGER_ADDRESS'
+    'STRATEGY_MANAGER_ADDRESS',
+    'SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'ENCRYPTION_KEY'
   ];
 
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
   
   if (missingVars.length > 0) {
     throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+  }
+
+  // Validate encryption key length
+  if (process.env['ENCRYPTION_KEY'] && process.env['ENCRYPTION_KEY'].length !== 32) {
+    throw new Error('ENCRYPTION_KEY must be exactly 32 characters long');
   }
 
   // Validate strategy allocations sum to 1
@@ -182,5 +214,10 @@ export function validateConfig(): void {
   
   if (Math.abs(totalAllocation - 1) > 0.01) {
     throw new Error(`Strategy allocations must sum to 1.0, got ${totalAllocation}`);
+  }
+
+  // Security warnings for development
+  if (CONFIG.nodeEnv === 'development') {
+    console.warn('⚠️  Running in development mode. Ensure all secrets are properly configured for production.');
   }
 }

@@ -64,6 +64,25 @@ const translations: Record<SupportedLang, Record<string, string>> = {
     // Currency
     currencyUsdc: 'USDC',
     currencyUsdt: 'USDT',
+    
+    // Wallet Connection
+    connectWallet: 'Connect Wallet',
+    connecting: 'Connecting...',
+    connected: 'Connected',
+    walletConnected: 'Wallet Connected',
+    connectToDeposit: 'Connect to Deposit',
+    connectToWithdraw: 'Connect to Withdraw',
+    connectToBuy: 'Connect to Buy',
+    connectToClaim: 'Connect to Claim',
+    connectToTransfer: 'Connect to Transfer',
+    walletRequiredForDeposit: 'Wallet connection required to deposit funds',
+    walletRequiredForWithdraw: 'Wallet connection required to withdraw funds',
+    walletRequiredForBuy: 'Wallet connection required to complete purchase',
+    walletRequiredForClaim: 'Wallet connection required to claim rewards',
+    walletRequiredForTransfer: 'Wallet connection required to transfer tokens',
+    walletRequiredForAction: 'Wallet connection required for this action',
+    readyTo: 'Ready to',
+    processing: 'Processing...',
   },
   ja: {
     // Common UI strings
@@ -121,6 +140,25 @@ const translations: Record<SupportedLang, Record<string, string>> = {
     // Currency
     currencyUsdc: 'USDC',
     currencyUsdt: 'USDT',
+    
+    // Wallet Connection
+    connectWallet: 'ウォレットを接続',
+    connecting: '接続中...',
+    connected: '接続済み',
+    walletConnected: 'ウォレット接続済み',
+    connectToDeposit: '入金のために接続',
+    connectToWithdraw: '出金のために接続',
+    connectToBuy: '購入のために接続',
+    connectToClaim: '受け取りのために接続',
+    connectToTransfer: '送金のために接続',
+    walletRequiredForDeposit: '入金にはウォレット接続が必要です',
+    walletRequiredForWithdraw: '出金にはウォレット接続が必要です',
+    walletRequiredForBuy: '購入にはウォレット接続が必要です',
+    walletRequiredForClaim: '受け取りにはウォレット接続が必要です',
+    walletRequiredForTransfer: '送金にはウォレット接続が必要です',
+    walletRequiredForAction: 'この操作にはウォレット接続が必要です',
+    readyTo: '準備完了',
+    processing: '処理中...',
   },
 };
 

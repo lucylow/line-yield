@@ -27,7 +27,7 @@ import { miniDappSDK } from '../services/MiniDappSDK';
 import { useLiff } from '../hooks/useLiff';
 import { PaymentHistoryModal } from '../components/PaymentHistoryModal';
 import { Transaction } from '../types/vault';
-import { useMiniDappTitle } from '../../packages/shared/src/hooks';
+import { useMiniDappTitle } from '@shared/hooks';
 
 interface UserData {
   connected: boolean;
@@ -37,13 +37,6 @@ interface UserData {
   transactions: Transaction[];
 }
 
-interface Transaction {
-  id: string;
-  type: 'deposit' | 'withdraw';
-  amount: number;
-  timestamp: string;
-  status: 'completed' | 'pending' | 'failed';
-}
 
 interface Strategy {
   name: string;
@@ -159,11 +152,11 @@ const LineMiniDapp: React.FC = () => {
         ...prev,
         balance: prev.balance + amount,
         transactions: [{
-          id: Date.now().toString(),
+          hash: `0x${Date.now().toString(16)}`,
           type: 'deposit',
-          amount,
-          timestamp: new Date().toLocaleString(),
-          status: 'completed'
+          amount: amount.toString(),
+          timestamp: Math.floor(Date.now() / 1000),
+          status: 'confirmed'
         }, ...prev.transactions]
       }));
       setDepositAmount('');
@@ -178,11 +171,11 @@ const LineMiniDapp: React.FC = () => {
         ...prev,
         balance: prev.balance - amount,
         transactions: [{
-          id: Date.now().toString(),
+          hash: `0x${Date.now().toString(16)}`,
           type: 'withdraw',
-          amount,
-          timestamp: new Date().toLocaleString(),
-          status: 'completed'
+          amount: amount.toString(),
+          timestamp: Math.floor(Date.now() / 1000),
+          status: 'confirmed'
         }, ...prev.transactions]
       }));
       setWithdrawAmount('');
@@ -202,14 +195,8 @@ const LineMiniDapp: React.FC = () => {
     setIsLoadingPaymentHistory(true);
 
     try {
-      // Convert local transactions to the Transaction interface format
-      const formattedTransactions: Transaction[] = userData.transactions.map(tx => ({
-        hash: `0x${Math.random().toString(16).substr(2, 64)}`, // Generate mock hash
-        type: tx.type as 'deposit' | 'withdraw' | 'claim',
-        amount: tx.amount.toString(),
-        timestamp: Math.floor(new Date(tx.timestamp).getTime() / 1000),
-        status: tx.status === 'completed' ? 'confirmed' : tx.status as 'pending' | 'confirmed' | 'failed'
-      }));
+      // Use local transactions directly (they're already in the correct format)
+      const formattedTransactions: Transaction[] = userData.transactions;
 
       // In a real implementation, you would fetch from your backend API:
       // const response = await fetch(`/api/payment-history?user=${walletAddress}`);
@@ -716,7 +703,7 @@ const LineMiniDapp: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {userData.transactions.slice(0, 5).map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={transaction.hash} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                       transaction.type === 'deposit' ? 'bg-green-100' : 'bg-blue-100'
@@ -736,7 +723,7 @@ const LineMiniDapp: React.FC = () => {
                     <p className={`font-medium ${
                       transaction.type === 'deposit' ? 'text-green-600' : 'text-blue-600'
                     }`}>
-                      {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                      {transaction.type === 'deposit' ? '+' : '-'}${parseFloat(transaction.amount).toFixed(2)}
                     </p>
                     <Badge variant="outline" className="text-xs">
                       {transaction.status}

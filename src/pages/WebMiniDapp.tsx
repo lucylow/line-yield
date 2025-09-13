@@ -24,7 +24,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { miniDappSDK } from '../services/MiniDappSDK';
-import { useMiniDappTitle } from '../../packages/shared/src/hooks';
+import { useMiniDappTitle } from '@shared/hooks';
 
 interface UserData {
   connected: boolean;
