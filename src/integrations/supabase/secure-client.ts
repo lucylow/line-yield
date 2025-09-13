@@ -48,3 +48,4 @@ validateSupabaseConfig();
 // Export types for use throughout the app
 export type { Database } from './types';
 
+

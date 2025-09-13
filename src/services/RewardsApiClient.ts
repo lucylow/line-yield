@@ -225,3 +225,4 @@ export class RewardsApiClient {
 // Export singleton instance
 export const rewardsApiClient = RewardsApiClient.getInstance();
 
+

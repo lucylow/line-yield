@@ -266,3 +266,4 @@ export const InviteFriends: React.FC<InviteFriendsProps> = ({
 
 export default InviteFriends;
 
+

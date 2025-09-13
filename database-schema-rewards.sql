@@ -346,3 +346,4 @@ COMMENT ON FUNCTION deduct_user_points IS 'Deducts points from a user account';
 COMMENT ON FUNCTION cleanup_expired_rewards IS 'Marks expired rewards as expired';
 COMMENT ON FUNCTION get_points_leaderboard IS 'Returns the points leaderboard';
 
+

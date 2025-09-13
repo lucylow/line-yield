@@ -288,3 +288,4 @@ export const RewardsWidget: React.FC<RewardsWidgetProps> = ({
 
 export default RewardsWidget;
 
+

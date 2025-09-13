@@ -324,3 +324,4 @@ contract YieldToken is ERC20, ERC20Burnable, ERC20Pausable, Ownable, ReentrancyG
     }
 }
 
+

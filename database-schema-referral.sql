@@ -311,3 +311,4 @@ COMMENT ON FUNCTION get_referral_stats IS 'Returns comprehensive referral statis
 COMMENT ON FUNCTION validate_referral_code IS 'Validates if a referral code exists and returns referrer info';
 COMMENT ON FUNCTION get_referral_leaderboard IS 'Returns the top referrers by referral count and earnings';
 
+
