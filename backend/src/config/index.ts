@@ -52,6 +52,12 @@ export interface AppConfig {
     maxGasPriceGwei: number;
     supportedMethods: string[];
   };
+  line: {
+    channelAccessToken: string;
+    channelId: string;
+    providerId?: string;
+    liffId?: string;
+  };
 }
 
 export interface StrategyConfig {
@@ -145,6 +151,13 @@ export const CONFIG: AppConfig = {
     relayerUrl: process.env['RELAYER_URL'] || 'http://localhost:3001',
     maxGasPriceGwei: parseFloat(process.env['GASLESS_MAX_GAS_PRICE_GWEI'] || '30'),
     supportedMethods: ['deposit', 'withdraw', 'mint', 'redeem']
+  },
+  
+  line: {
+    channelAccessToken: process.env['LINE_CHANNEL_ACCESS_TOKEN'] || '',
+    channelId: process.env['LINE_CHANNEL_ID'] || '',
+    providerId: process.env['LINE_PROVIDER_ID'],
+    liffId: process.env['LINE_LIFF_ID']
   }
 };
 

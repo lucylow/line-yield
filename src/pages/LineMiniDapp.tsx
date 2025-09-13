@@ -20,10 +20,13 @@ import {
   CheckCircle,
   User,
   MessageSquare,
-  Plus
+  Plus,
+  Eye
 } from 'lucide-react';
 import { miniDappSDK } from '../services/MiniDappSDK';
 import { useLiff } from '../hooks/useLiff';
+import { PaymentHistoryModal } from '../components/PaymentHistoryModal';
+import { Transaction } from '../types/vault';
 
 interface UserData {
   connected: boolean;
@@ -70,8 +73,11 @@ const LineMiniDapp: React.FC = () => {
 
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [isPaymentHistoryModalOpen, setIsPaymentHistoryModalOpen] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [paymentHistoryTransactions, setPaymentHistoryTransactions] = useState<Transaction[]>([]);
+  const [isLoadingPaymentHistory, setIsLoadingPaymentHistory] = useState(false);
 
   const strategies: Strategy[] = [
     { name: 'Aave Lending', apy: 5.2, allocation: 40, icon: '🏦', color: 'bg-blue-500' },
@@ -177,6 +183,41 @@ const LineMiniDapp: React.FC = () => {
       }));
       setWithdrawAmount('');
       setIsWithdrawModalOpen(false);
+    }
+  };
+
+  // Function triggered to open payment history modal
+  const openPaymentHistory = () => {
+    setIsPaymentHistoryModalOpen(true);
+    fetchPaymentHistory();
+  };
+
+  // Fetch payment history from backend or blockchain
+  const fetchPaymentHistory = async () => {
+    if (!walletAddress) return;
+    setIsLoadingPaymentHistory(true);
+
+    try {
+      // Convert local transactions to the Transaction interface format
+      const formattedTransactions: Transaction[] = userData.transactions.map(tx => ({
+        hash: `0x${Math.random().toString(16).substr(2, 64)}`, // Generate mock hash
+        type: tx.type as 'deposit' | 'withdraw' | 'claim',
+        amount: tx.amount.toString(),
+        timestamp: Math.floor(new Date(tx.timestamp).getTime() / 1000),
+        status: tx.status === 'completed' ? 'confirmed' : tx.status as 'pending' | 'confirmed' | 'failed'
+      }));
+
+      // In a real implementation, you would fetch from your backend API:
+      // const response = await fetch(`/api/payment-history?user=${walletAddress}`);
+      // if (!response.ok) throw new Error('Failed to fetch payment history');
+      // const data: Transaction[] = await response.json();
+      
+      setPaymentHistoryTransactions(formattedTransactions);
+    } catch (error) {
+      console.error('Error fetching payment history:', error);
+      setPaymentHistoryTransactions([]);
+    } finally {
+      setIsLoadingPaymentHistory(false);
     }
   };
 
@@ -644,12 +685,31 @@ const LineMiniDapp: React.FC = () => {
         </div>
 
         {/* Transaction History */}
-        {userData.transactions.length > 0 && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-            <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
               <History className="w-5 h-5 text-blue-600" />
               Recent Transactions
             </h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={openPaymentHistory}
+              className="hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              View All History
+            </Button>
+          </div>
+          {userData.transactions.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 mb-4">No transactions yet</p>
+              <p className="text-sm text-gray-400">Start by depositing USDT to begin earning yield</p>
+            </div>
+          ) : (
             <div className="space-y-3">
               {userData.transactions.slice(0, 5).map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -681,9 +741,18 @@ const LineMiniDapp: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
+      {/* Payment History Modal */}
+      <PaymentHistoryModal
+        isOpen={isPaymentHistoryModalOpen}
+        onClose={() => setIsPaymentHistoryModalOpen(false)}
+        transactions={paymentHistoryTransactions}
+        isLoading={isLoadingPaymentHistory}
+        onRefresh={fetchPaymentHistory}
+      />
     </div>
   );
 };

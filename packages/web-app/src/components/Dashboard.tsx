@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button, ConnectWallet, BalanceDisplay, TransactionHistory } from '@shared/components';
 import { useLineYield, usePlatform } from '@shared/hooks';
 
@@ -185,6 +186,22 @@ const Dashboard: React.FC = () => {
             </div>
           </>
         )}
+
+        {/* Payment Demo Section */}
+        <div className="mb-8">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Demo</h3>
+            <p className="text-gray-600 mb-4">
+              Test LINE Mini Dapp payment functionality with both crypto and Stripe payments.
+            </p>
+            <Link 
+              to="/payment-demo"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Try Payment Demo
+            </Link>
+          </div>
+        </div>
 
         {/* Platform-specific features */}
         {isLiff && (
