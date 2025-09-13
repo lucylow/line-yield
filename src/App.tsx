@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import { LiffProvider } from "./hooks/useLiff";
 import { useAnalytics } from "./hooks/useAnalytics";
 import { useGlobalErrorHandler } from "./hooks/useErrorHandler";
+import { usePreventGoBack } from "@shared/hooks";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +34,13 @@ const queryClient = new QueryClient({
 const AppContent = () => {
   const { trackPageView } = useAnalytics();
   const { handleGlobalError, handleUnhandledRejection } = useGlobalErrorHandler();
+  
+  // Prevent accidental navigation back from Mini Dapp pages
+  usePreventGoBack({
+    enabled: true,
+    protectedPaths: ['/line-mini-dapp', '/web-mini-dapp', '/mini-dapp-demo'],
+    preventUnload: true,
+  });
 
   // Track page views
   React.useEffect(() => {

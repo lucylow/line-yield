@@ -8,3 +8,7 @@ export { ConnectWallet } from './ConnectWallet';
 export { BalanceDisplay } from './BalanceDisplay';
 export { TransactionHistory } from './TransactionHistory';
 export { WelcomeBanner } from './WelcomeBanner';
+export { ConfirmationDialog, useConfirmationDialog } from './ConfirmationDialog';
+export { NavigationPreventionDemo } from './NavigationPreventionDemo';
+export { CompliantConnectButton, useWalletConnection as useCompliantWalletConnection } from './CompliantConnectButton';
+export { ActionTriggeredConnect, useActionTriggeredConnect } from './ActionTriggeredConnect';

@@ -31,4 +31,18 @@ export {
   type TwitterConfig,
 } from './metaTagsUtils';
 
+export {
+  isProtectedPath,
+  addHistoryState,
+  removeHistoryState,
+  showConfirmationDialog,
+  setupNavigationPrevention,
+  navigationPreventionPresets,
+  getLocalizedConfirmationMessage,
+  validateNavigationConfig,
+  isNavigationPreventionSupported,
+  DEFAULT_NAVIGATION_CONFIG,
+  type NavigationPreventionConfig,
+} from './navigationUtils';
+
 
