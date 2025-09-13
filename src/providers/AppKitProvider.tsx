@@ -3,7 +3,30 @@ import { createAppKit } from '@reown/appkit/react';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { kaia, mainnet, arbitrum, polygon, base } from '@reown/appkit/networks';
+import { mainnet, arbitrum, polygon, base } from '@reown/appkit/networks';
+
+// Define Kaia network since it might not be in the default networks
+const kaia = {
+  id: 8217,
+  name: 'Kaia',
+  nativeCurrency: {
+    name: 'Kaia',
+    symbol: 'KLAY',
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://public-en-kaia.klaytnweb3.com/v1/baobab'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'KaiaScope',
+      url: 'https://baobab.klaytnscope.com',
+    },
+  },
+  testnet: true,
+} as const;
 
 // Setup query client for React Query
 const queryClient = new QueryClient({
@@ -33,7 +56,7 @@ const networks = [
   arbitrum, // Arbitrum
   polygon, // Polygon
   base, // Base
-];
+] as const;
 
 // Create Wagmi Adapter
 const wagmiAdapter = new WagmiAdapter({

@@ -1,6 +1,7 @@
 import { useAccount, useConnect, useDisconnect, useBalance, useChainId, useSwitchChain } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
-import { kaia } from '@reown/appkit/networks';
+// Define Kaia network constant
+const KAIANETWORK_ID = 8217;
 
 export interface WalletInfo {
   address: string | undefined;
@@ -32,7 +33,7 @@ export function useWallet(): WalletInfo & {
     chainId: chainId,
   });
 
-  const isKaiaNetwork = chainId === kaia.id;
+  const isKaiaNetwork = chainId === KAIANETWORK_ID;
 
   const connectWallet = () => {
     open();
@@ -44,7 +45,7 @@ export function useWallet(): WalletInfo & {
 
   const switchToKaia = () => {
     if (switchChain) {
-      switchChain({ chainId: kaia.id });
+      switchChain({ chainId: KAIANETWORK_ID });
     }
   };
 
@@ -81,11 +82,11 @@ export function useNetworkCheck() {
   const { chainId, isConnected } = useAccount();
   const { switchChain } = useSwitchChain();
   
-  const isCorrectNetwork = chainId === kaia.id;
+  const isCorrectNetwork = chainId === KAIANETWORK_ID;
   
   const switchToCorrectNetwork = () => {
     if (switchChain) {
-      switchChain({ chainId: kaia.id });
+      switchChain({ chainId: KAIANETWORK_ID });
     }
   };
   
@@ -94,7 +95,7 @@ export function useNetworkCheck() {
     isConnected,
     switchToCorrectNetwork,
     currentChainId: chainId,
-    targetChainId: kaia.id,
+    targetChainId: KAIANETWORK_ID,
   };
 }
 

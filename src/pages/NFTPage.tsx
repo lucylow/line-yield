@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NFTCollection } from '../packages/shared/src/components/NFTCollection';
 import { NFTMinter } from '../packages/shared/src/components/NFTMinter';
-import { cn } from '../packages/shared/src/utils/cn';
+import { cn } from '../utils/cn';
 
 interface NFTTier {
   tier: number;

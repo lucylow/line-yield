@@ -1,12 +1,13 @@
 import React from 'react';
 import { AppKitProvider } from './providers/AppKitProvider';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { WalletConnectButton } from './components/WalletConnectButton';
 import { NetworkBanner } from './components/NetworkBanner';
 import { LoanPage } from './pages/LoanPage';
 import { ReferralPage } from './pages/ReferralPage';
 import { NFTPage } from './pages/NFTPage';
 import { SmartContractInteraction } from './components/SmartContractInteraction';
-import { cn } from './packages/shared/src/utils/cn';
+import { cn } from './utils/cn';
 
 // Example USDT contract address on Kaia (replace with actual address)
 const USDT_CONTRACT_ADDRESS = '0x...'; // Replace with actual USDT contract address
@@ -44,8 +45,9 @@ function App() {
   };
 
   return (
-    <AppKitProvider>
-      <div className="min-h-screen bg-gray-50">
+    <ErrorBoundary>
+      <AppKitProvider>
+        <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -171,8 +173,9 @@ function App() {
             </div>
           </div>
         </footer>
-      </div>
-    </AppKitProvider>
+        </div>
+      </AppKitProvider>
+    </ErrorBoundary>
   );
 }
 

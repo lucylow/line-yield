@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNetworkCheck } from '../hooks/useWallet';
-import { cn } from '../packages/shared/src/utils/cn';
+import { cn } from '../utils/cn';
 
 interface NetworkBannerProps {
   className?: string;
