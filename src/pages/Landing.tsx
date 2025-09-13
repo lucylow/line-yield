@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Zap, Bot, Shield, TrendingUp, LineChart, ArrowUp, ArrowDown, PlayCircle, FileText, Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useWallet } from '@/hooks/useWallet';
-import Chatbot from '@/components/Chatbot';
+import { Button } from '../components/simple/Button';
+import { useWallet } from '../hooks/useWallet';
+import Chatbot from '../components/Chatbot';
 
 export const Landing = () => {
-  const navigate = useNavigate();
-  const { wallet, connectWallet } = useWallet();
+  const { isConnected, connect } = useWallet();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -20,10 +18,11 @@ export const Landing = () => {
   }, []);
 
   const handleGetStarted = async () => {
-    if (!wallet.isConnected) {
-      await connectWallet();
+    if (!isConnected) {
+      connect();
     }
-    navigate('/dashboard');
+    // For now, just show an alert - can be replaced with actual dashboard navigation later
+    alert('Welcome to LINE Yield! Dashboard functionality will be implemented here.');
   };
 
   const handleConnectWallet = () => {
