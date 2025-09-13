@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { WalletConnectButton } from '@/components/WalletConnectButton';
-import { NetworkBanner } from '@/components/NetworkBanner';
+import { Button } from '../ui/button';
+import { WalletConnectButton } from '../WalletConnectButton';
+import { NetworkBanner } from '../NetworkBanner';
 import { 
   Menu, 
   X, 
@@ -15,7 +15,7 @@ import {
   HelpCircle,
   ChevronDown
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 
 export const Header: React.FC = () => {
   const location = useLocation();

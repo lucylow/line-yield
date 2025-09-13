@@ -7,9 +7,9 @@ import Layout from './components/layout/Layout';
 // Import pages
 import Landing from './pages/Landing';
 import Index from './pages/Index';
-import LoanPage from './pages/LoanPage';
-import ReferralPage from './pages/ReferralPage';
-import NFTPage from './pages/NFTPage';
+import { LoanPage } from './pages/LoanPage';
+import { ReferralPage } from './pages/ReferralPage';
+import { NFTPage } from './pages/NFTPage';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Help from './pages/Help';
