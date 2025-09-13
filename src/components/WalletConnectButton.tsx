@@ -177,9 +177,16 @@ export const WalletConnectButton: React.FC<WalletConnectButtonProps> = ({
 
 // Simple AppKit Button Component (alternative to custom button)
 export const AppKitButton: React.FC<{ className?: string }> = ({ className }) => {
+  const { openAppKit } = useWallet();
+  
   return (
     <div className={className}>
-      <appkit-button />
+      <button 
+        onClick={openAppKit}
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Connect Wallet
+      </button>
     </div>
   );
 };
