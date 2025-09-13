@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '../utils/cn';
-import { useT, useDateFormat } from '../hooks';
+import { useT, useDateFormat, useCurrencyFormat } from '../hooks';
 
 interface Transaction {
   id: string;
@@ -23,6 +23,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 }) => {
   const t = useT();
   const formatDate = useDateFormat();
+  const formatCurrency = useCurrencyFormat();
 
   const getStatusColor = (status: Transaction['status']) => {
     switch (status) {
@@ -119,7 +120,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             
             <div className="text-right">
               <p className={cn('text-sm font-medium', getTypeColor(tx.type))}>
-                {tx.type === 'deposit' ? '+' : tx.type === 'withdraw' ? '-' : '+'}{tx.amount} {tx.token || t('currencyUsdc')}
+                {tx.type === 'deposit' ? '+' : tx.type === 'withdraw' ? '-' : '+'}{formatCurrency(parseFloat(tx.amount), 'USD')}
               </p>
               <span className={cn('inline-flex px-2 py-1 text-xs font-medium rounded-full', getStatusColor(tx.status))}>
                 {tx.status === 'completed' ? t('statusConfirmed') : t(`status${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}`)}

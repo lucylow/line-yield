@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Zap, Bot, Shield, TrendingUp, LineChart, ArrowUp, ArrowDown, PlayCircle, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWallet } from '@/hooks/useWallet';
+import Chatbot from '@/components/Chatbot';
 
 export const Landing = () => {
   const navigate = useNavigate();
@@ -332,6 +333,9 @@ export const Landing = () => {
           </div>
         </div>
       </section>
+
+      {/* Chatbot */}
+      <Chatbot />
     </div>
   );
 };

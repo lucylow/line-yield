@@ -14,11 +14,11 @@ import LineMiniDapp from "./pages/LineMiniDapp";
 import WebMiniDapp from "./pages/WebMiniDapp";
 import MiniDappDemo from "./pages/MiniDappDemo";
 import SecurityAudit from "./pages/SecurityAudit";
+import KaiaLineMiniDapp from "./pages/KaiaLineMiniDapp";
 import NotFound from "./pages/NotFound";
 import { LiffProvider } from "./hooks/useLiff";
 import { useAnalytics } from "./hooks/useAnalytics";
 import { useGlobalErrorHandler } from "./hooks/useErrorHandler";
-import { usePreventGoBack } from "@shared/hooks";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,13 +34,6 @@ const queryClient = new QueryClient({
 const AppContent = () => {
   const { trackPageView } = useAnalytics();
   const { handleGlobalError, handleUnhandledRejection } = useGlobalErrorHandler();
-  
-  // Prevent accidental navigation back from Mini Dapp pages
-  usePreventGoBack({
-    enabled: true,
-    protectedPaths: ['/line-mini-dapp', '/web-mini-dapp', '/mini-dapp-demo'],
-    preventUnload: true,
-  });
 
   // Track page views
   React.useEffect(() => {
@@ -113,6 +106,7 @@ const AppContent = () => {
               <Footer />
             </div>
           } />
+          <Route path="/kaia-mini-dapp" element={<KaiaLineMiniDapp />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -127,7 +121,9 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AppContent />
+      <AppWrapper>
+        <AppContent />
+      </AppWrapper>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -6,6 +6,7 @@ import { Layout, Button } from '../../shared/src';
 import { useUniversalWallet, useLineYield } from '../../shared/src';
 import PaymentDemo from './components/PaymentDemo';
 import InviteFriends from './components/InviteFriends';
+import RewardsWidget from './components/RewardsWidget';
 
 const queryClient = new QueryClient();
 
@@ -85,7 +86,7 @@ const YieldDashboard: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Your Balance</h3>
             <p className="text-3xl font-bold text-blue-600">
@@ -105,6 +106,11 @@ const YieldDashboard: React.FC = () => {
             <p className="text-3xl font-bold text-purple-600">
               {vaultData?.currentAPY || 0}%
             </p>
+          </div>
+
+          {/* Rewards Widget */}
+          <div className="lg:col-span-1">
+            <RewardsWidget compact={true} />
           </div>
         </div>
 
