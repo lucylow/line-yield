@@ -3,11 +3,11 @@ import { cn } from '../utils/cn';
 
 interface Transaction {
   id: string;
-  type: 'deposit' | 'withdraw';
+  type: 'deposit' | 'withdraw' | 'yield';
   amount: string;
-  token: string;
-  timestamp: Date;
-  status: 'pending' | 'confirmed' | 'failed';
+  token?: string;
+  timestamp: Date | number;
+  status: 'pending' | 'confirmed' | 'failed' | 'completed';
   hash?: string;
 }
 
@@ -20,7 +20,8 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   transactions = [],
   className = ''
 }) => {
-  const formatDate = (date: Date) => {
+  const formatDate = (timestamp: Date | number) => {
+    const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp;
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -32,6 +33,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const getStatusColor = (status: Transaction['status']) => {
     switch (status) {
       case 'confirmed':
+      case 'completed':
         return 'text-green-600 bg-green-100';
       case 'pending':
         return 'text-yellow-600 bg-yellow-100';
@@ -43,19 +45,45 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   };
 
   const getTypeColor = (type: Transaction['type']) => {
-    return type === 'deposit' ? 'text-green-600' : 'text-red-600';
+    switch (type) {
+      case 'deposit':
+        return 'text-green-600';
+      case 'withdraw':
+        return 'text-red-600';
+      case 'yield':
+        return 'text-purple-600';
+      default:
+        return 'text-gray-600';
+    }
   };
 
   const getTypeIcon = (type: Transaction['type']) => {
-    return type === 'deposit' ? (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-    ) : (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4m16 0l-4-4m4 4l-4 4" />
-      </svg>
-    );
+    switch (type) {
+      case 'deposit':
+        return (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        );
+      case 'withdraw':
+        return (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4m16 0l-4-4m4 4l-4 4" />
+          </svg>
+        );
+      case 'yield':
+        return (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        );
+      default:
+        return (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        );
+    }
   };
 
   if (transactions.length === 0) {
@@ -97,10 +125,10 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             
             <div className="text-right">
               <p className={cn('text-sm font-medium', getTypeColor(tx.type))}>
-                {tx.type === 'deposit' ? '+' : '-'}{tx.amount} {tx.token}
+                {tx.type === 'deposit' ? '+' : tx.type === 'withdraw' ? '-' : '+'}{tx.amount} {tx.token || 'USDC'}
               </p>
               <span className={cn('inline-flex px-2 py-1 text-xs font-medium rounded-full', getStatusColor(tx.status))}>
-                {tx.status}
+                {tx.status === 'completed' ? 'confirmed' : tx.status}
               </span>
             </div>
           </div>

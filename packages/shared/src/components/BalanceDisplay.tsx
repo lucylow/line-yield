@@ -4,11 +4,15 @@ import { useLineYield } from '../hooks/useLineYield';
 import { cn } from '../utils/cn';
 
 interface BalanceDisplayProps {
+  balance?: string;
+  earned?: string;
   className?: string;
   showYield?: boolean;
 }
 
 export const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
+  balance,
+  earned,
   className = '',
   showYield = true
 }) => {
@@ -33,29 +37,25 @@ export const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
           </p>
         </div>
 
-        {showYield && vaultData && (
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-sm font-medium text-gray-600 mb-1">Deposited</h3>
-            <p className="text-2xl font-bold text-green-600">
-              {vaultData.userDeposited} USDC
-            </p>
-          </div>
-        )}
-      </div>
-
-      {showYield && vaultData && (
         <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Yield Earned</h3>
-            <span className="text-sm text-gray-500">
-              {vaultData.currentAPY}% APY
-            </span>
-          </div>
-          <p className="text-xl font-bold text-purple-600">
-            {vaultData.userYield} USDC
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Deposited</h3>
+          <p className="text-2xl font-bold text-green-600">
+            {balance || vaultData?.userDeposited || '0'} USDC
           </p>
         </div>
-      )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-sm font-medium text-gray-600">Yield Earned</h3>
+          <span className="text-sm text-gray-500">
+            {vaultData?.currentAPY || '0'}% APY
+          </span>
+        </div>
+        <p className="text-xl font-bold text-purple-600">
+          {earned || vaultData?.userYield || '0'} USDC
+        </p>
+      </div>
     </div>
   );
 };
