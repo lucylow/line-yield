@@ -1,281 +1,358 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Share2, Users, Gift, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Users, 
+  Copy, 
+  Share2, 
+  Gift, 
+  CheckCircle, 
+  AlertCircle,
+  ExternalLink,
+  QrCode,
+  Link as LinkIcon
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useWallet } from '@/hooks/useWallet';
-
-interface ReferralStats {
-  totalReferrals: number;
-  totalEarnings: string;
-  pendingRewards: string;
-}
+import { gamificationService } from '@/services/GamificationService';
 
 interface ReferralSystemProps {
   className?: string;
 }
 
-export const ReferralSystem: React.FC<ReferralSystemProps> = ({
-  className = ''
-}) => {
-  const [copySuccess, setCopySuccess] = useState(false);
-  const [referralStats, setReferralStats] = useState<ReferralStats>({
+export const ReferralSystem: React.FC<ReferralSystemProps> = ({ className }) => {
+  const [referralCode, setReferralCode] = useState<string>('');
+  const [referralStats, setReferralStats] = useState({
     totalReferrals: 0,
-    totalEarnings: '0.00',
-    pendingRewards: '0.00'
+    referralPoints: '0',
+    totalEarned: '0'
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   
-  const { toast } = useToast();
   const { wallet } = useWallet();
+  const { toast } = useToast();
 
-  // Generate personalized invite link
-  const generateInviteLink = () => {
-    const baseUrl = window.location.origin;
-    const referralCode = wallet.address ? 
-      `?ref=${wallet.address.slice(0, 8)}` : 
-      '?ref=line-yield';
-    
-    return `${baseUrl}/dashboard${referralCode}`;
-  };
-
-  // Copy invite link to clipboard
-  const handleCopyInviteLink = async () => {
-    try {
-      const inviteLink = generateInviteLink();
-      await navigator.clipboard.writeText(inviteLink);
-      
-      setCopySuccess(true);
-      toast({
-        title: "Invite Link Copied!",
-        description: "Share this link with friends to earn rewards together",
-      });
-      
-      setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy invite link:', err);
-      toast({
-        title: "Copy Failed",
-        description: "Unable to copy invite link. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Share invite link using Web Share API or fallback to copy
-  const handleShareInviteLink = async () => {
-    try {
-      const inviteLink = generateInviteLink();
-      const shareText = `🚀 Join me on LINE Yield and start earning 8.64% APY on your USDT! 
-
-💰 Earn automated yield on stablecoins
-🔒 Secure DeFi strategies on Kaia blockchain
-📱 Access directly from LINE Messenger
-
-Get started: ${inviteLink}`;
-      
-      if (navigator.share) {
-        await navigator.share({
-          title: 'LINE Yield - Earn Automated Yield',
-          text: shareText,
-          url: inviteLink,
-        });
-      } else {
-        await navigator.clipboard.writeText(shareText);
-        toast({
-          title: "Invite Message Copied!",
-          description: "Share this message with your friends",
-        });
-      }
-    } catch (err) {
-      console.error('Failed to share invite link:', err);
-      toast({
-        title: "Share Failed",
-        description: "Unable to share invite link. Please try copying instead.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Simulate loading referral stats (in real app, this would come from API)
+  // Generate referral code from wallet address
   useEffect(() => {
-    // Simulate API call to get referral stats
-    const loadReferralStats = async () => {
-      // Mock data - replace with actual API call
-      setReferralStats({
-        totalReferrals: 12,
-        totalEarnings: '45.67',
-        pendingRewards: '12.34'
-      });
-    };
+    if (wallet.address) {
+      // Create a shorter referral code from the address
+      const code = wallet.address.slice(2, 8).toUpperCase();
+      setReferralCode(code);
+    }
+  }, [wallet.address]);
 
-    if (wallet.isConnected) {
+  // Load referral stats
+  useEffect(() => {
+    if (wallet.connected && wallet.provider) {
       loadReferralStats();
     }
-  }, [wallet.isConnected]);
+  }, [wallet.connected, wallet.provider]);
 
-  if (!wallet.isConnected) {
-    return (
-      <Card className={className}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Referral Program
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">
-            Connect your wallet to access the referral program and start earning rewards.
-          </p>
-          <Button disabled className="w-full">
-            Connect Wallet to Access Referrals
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const loadReferralStats = async () => {
+    if (!wallet.provider || !wallet.address) return;
+
+    setIsLoading(true);
+    try {
+      await gamificationService.initialize(wallet.provider, wallet.signer);
+      const stats = await gamificationService.getUserStats(wallet.address);
+      
+      setReferralStats({
+        totalReferrals: stats.referrals,
+        referralPoints: stats.referralPoints,
+        totalEarned: stats.totalEarned
+      });
+    } catch (error) {
+      console.error('Failed to load referral stats:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const copyReferralLink = async () => {
+    const referralLink = `${window.location.origin}?ref=${referralCode}`;
+    
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      toast({
+        title: 'Copied!',
+        description: 'Referral link copied to clipboard',
+      });
+      
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast({
+        title: 'Copy Failed',
+        description: 'Failed to copy referral link',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const shareReferralLink = async () => {
+    const referralLink = `${window.location.origin}?ref=${referralCode}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join LINE YIELD with my referral!',
+          text: 'Earn yield on your stablecoins with LINE YIELD. Use my referral code for bonus points!',
+          url: referralLink,
+        });
+      } catch (error) {
+        console.error('Share failed:', error);
+      }
+    } else {
+      // Fallback to copy
+      await copyReferralLink();
+    }
+  };
+
+  const generateQRCode = () => {
+    const referralLink = `${window.location.origin}?ref=${referralCode}`;
+    // In a real implementation, you would generate a QR code
+    // For now, we'll just show the link
+    return referralLink;
+  };
+
+  const getReferralLink = () => {
+    return `${window.location.origin}?ref=${referralCode}`;
+  };
+
+  const getSocialShareLinks = () => {
+    const referralLink = encodeURIComponent(getReferralLink());
+    const text = encodeURIComponent('Join LINE YIELD with my referral! Earn yield on your stablecoins and get bonus points!');
+    
+    return {
+      twitter: `https://twitter.com/intent/tweet?text=${text}&url=${referralLink}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${referralLink}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${referralLink}`,
+      telegram: `https://t.me/share/url?url=${referralLink}&text=${text}`,
+      whatsapp: `https://wa.me/?text=${text}%20${referralLink}`
+    };
+  };
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Referral Stats */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            Your Referral Stats
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">
-                {referralStats.totalReferrals}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Referrals</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                ${referralStats.totalEarnings}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Earnings</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">
-                ${referralStats.pendingRewards}
-              </div>
-              <div className="text-sm text-muted-foreground">Pending Rewards</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className={className}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
+            <Users className="h-6 w-6 text-blue-500" />
+            Referral System
+          </h2>
+          <p className="text-muted-foreground">
+            Invite friends and earn 50 points for each successful referral
+          </p>
+        </div>
 
-      {/* Invite Link Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Gift className="w-5 h-5" />
-            Invite Friends & Earn
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Share your invite link and earn 0.5% of your friends' yield earnings!
-            </p>
-            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-              <code className="flex-1 text-sm font-mono">
-                {generateInviteLink()}
-              </code>
+        {/* Referral Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-blue-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Referrals</p>
+                  <p className="text-lg font-semibold">{referralStats.totalReferrals}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Gift className="h-4 w-4 text-green-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Referral Points</p>
+                  <p className="text-lg font-semibold">{referralStats.referralPoints}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-purple-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Earned</p>
+                  <p className="text-lg font-semibold">{referralStats.totalEarned}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Referral Code */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <LinkIcon className="h-5 w-5" />
+              Your Referral Code
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Input
+                value={referralCode}
+                readOnly
+                className="font-mono text-lg"
+              />
               <Button
-                variant="ghost"
+                onClick={copyReferralLink}
+                variant="outline"
                 size="sm"
-                onClick={() => window.open(generateInviteLink(), '_blank')}
+                className={copied ? 'bg-green-50 border-green-200' : ''}
               >
-                <ExternalLink className="w-4 h-4" />
+                {copied ? <CheckCircle className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              onClick={handleCopyInviteLink}
-              className="flex-1 flex items-center gap-2"
-              disabled={copySuccess}
-            >
-              {copySuccess ? (
-                <>
-                  <Copy className="w-4 h-4" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4" />
-                  Copy Link
-                </>
-              )}
-            </Button>
             
-            <Button
-              onClick={handleShareInviteLink}
-              variant="outline"
-              className="flex-1 flex items-center gap-2"
-            >
-              <Share2 className="w-4 h-4" />
-              Share
-            </Button>
-          </div>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-2">Share your referral link:</p>
+              <div className="p-3 bg-muted rounded-lg font-mono text-sm break-all">
+                {getReferralLink()}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">0.5% Commission</Badge>
-            <Badge variant="secondary">Lifetime Rewards</Badge>
-            <Badge variant="secondary">No Limits</Badge>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Share Options */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              Share & Earn
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Button
+                onClick={shareReferralLink}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Share2 className="h-4 w-4" />
+                Share
+              </Button>
+              
+              <Button
+                onClick={() => window.open(getSocialShareLinks().twitter, '_blank')}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Twitter
+              </Button>
+              
+              <Button
+                onClick={() => window.open(getSocialShareLinks().telegram, '_blank')}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Telegram
+              </Button>
+              
+              <Button
+                onClick={() => window.open(getSocialShareLinks().whatsapp, '_blank')}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                WhatsApp
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* How It Works */}
-      <Card>
-        <CardHeader>
-          <CardTitle>How Referrals Work</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
-                1
+        {/* How It Works */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              How Referrals Work
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  1
+                </div>
+                <div>
+                  <p className="font-medium">Share Your Referral Link</p>
+                  <p className="text-sm text-muted-foreground">
+                    Copy your unique referral link and share it with friends
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium">Share Your Link</p>
-                <p className="text-sm text-muted-foreground">
-                  Copy and share your personalized invite link with friends
-                </p>
+              
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  2
+                </div>
+                <div>
+                  <p className="font-medium">Friend Joins & Deposits</p>
+                  <p className="text-sm text-muted-foreground">
+                    When your friend joins using your link and makes their first deposit
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  3
+                </div>
+                <div>
+                  <p className="font-medium">Both Earn Points</p>
+                  <p className="text-sm text-muted-foreground">
+                    You both receive 50 points automatically
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
-                2
+          </CardContent>
+        </Card>
+
+        {/* Referral Rewards */}
+        <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+          <CardContent className="pt-4">
+            <div className="text-center space-y-2">
+              <Gift className="h-8 w-8 mx-auto text-green-500" />
+              <h3 className="font-semibold text-lg">Referral Rewards</h3>
+              <div className="flex justify-center gap-4">
+                <Badge variant="outline" className="text-green-600 border-green-300">
+                  You: 50 Points
+                </Badge>
+                <Badge variant="outline" className="text-blue-600 border-blue-300">
+                  Friend: 50 Points
+                </Badge>
               </div>
-              <div>
-                <p className="font-medium">Friends Join & Deposit</p>
-                <p className="text-sm text-muted-foreground">
-                  When friends use your link and deposit USDT, you become their referrer
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                No limit on referrals! Earn more by inviting more friends.
+              </p>
             </div>
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
-                3
-              </div>
-              <div>
-                <p className="font-medium">Earn Commission</p>
-                <p className="text-sm text-muted-foreground">
-                  Earn 0.5% of their yield earnings automatically, forever
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Terms & Conditions */}
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="text-xs">
+            <strong>Terms:</strong> Referrals must be new users who haven't previously used LINE YIELD. 
+            Points are awarded after the referred user makes their first deposit. 
+            Referral points are non-transferable and cannot be exchanged for cash.
+          </AlertDescription>
+        </Alert>
+      </div>
     </div>
   );
 };

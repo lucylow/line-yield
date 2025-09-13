@@ -16,9 +16,17 @@ import MiniDappDemo from "./pages/MiniDappDemo";
 import SecurityAudit from "./pages/SecurityAudit";
 import KaiaLineMiniDapp from "./pages/KaiaLineMiniDapp";
 import NotFound from "./pages/NotFound";
+// Mobile-specific pages
+import MobileLanding from "./pages/MobileLanding";
+import MobileDashboard from "./pages/MobileDashboard";
+import MobileGamification from "./pages/MobileGamification";
 import { LiffProvider } from "./hooks/useLiff";
 import { useAnalytics } from "./hooks/useAnalytics";
 import { useGlobalErrorHandler } from "./hooks/useErrorHandler";
+import { useMobile } from "./hooks/useMobile";
+import { LocalizationProvider } from "@shared/contexts";
+import { usePreventGoBack } from "@shared/hooks";
+import { AppWrapper } from "./components/AppWrapper";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +42,10 @@ const queryClient = new QueryClient({
 const AppContent = () => {
   const { trackPageView } = useAnalytics();
   const { handleGlobalError, handleUnhandledRejection } = useGlobalErrorHandler();
+  const { isMobile } = useMobile();
+
+  // Prevent accidental navigation on mobile
+  usePreventGoBack();
 
   // Track page views
   React.useEffect(() => {
@@ -51,6 +63,31 @@ const AppContent = () => {
     };
   }, [handleGlobalError, handleUnhandledRejection]);
 
+  // Mobile-specific routes
+  if (isMobile) {
+    return (
+      <>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<MobileLanding />} />
+            <Route path="/dashboard" element={<MobileDashboard />} />
+            <Route path="/gamification" element={<MobileGamification />} />
+            <Route path="/line-mini-dapp" element={
+              <LiffProvider>
+                <LineMiniDapp />
+              </LiffProvider>
+            } />
+            <Route path="/kaia-mini-dapp" element={<KaiaLineMiniDapp />} />
+            {/* Redirect other routes to mobile landing */}
+            <Route path="*" element={<MobileLanding />} />
+          </Routes>
+        </BrowserRouter>
+        <PerformanceMonitor />
+      </>
+    );
+  }
+
+  // Desktop routes
   return (
     <>
       <BrowserRouter>
@@ -118,13 +155,15 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AppWrapper>
-        <AppContent />
-      </AppWrapper>
-    </TooltipProvider>
+    <LocalizationProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AppWrapper>
+          <AppContent />
+        </AppWrapper>
+      </TooltipProvider>
+    </LocalizationProvider>
   </QueryClientProvider>
 );
 

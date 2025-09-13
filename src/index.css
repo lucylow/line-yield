@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import mobile-specific styles */
+@import './styles/mobile.css';
+
 /* LINE Yield Mini-DApp Design System - DeFi & Financial Focus */
 
 @layer base {

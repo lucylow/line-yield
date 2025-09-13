@@ -1,6 +1,7 @@
 import { YieldOracle } from './services/yield-oracle';
 import { Rebalancer } from './services/rebalancer';
 import { GaslessRelayer } from './services/gasless-relayer';
+import { ApiServer } from './services/api-server';
 import { Logger } from './utils/logger';
 import { CONFIG, validateConfig } from './config';
 
@@ -8,11 +9,13 @@ class Application {
   private yieldOracle: YieldOracle;
   private rebalancer: Rebalancer;
   private gaslessRelayer: GaslessRelayer;
+  private apiServer: ApiServer;
 
   constructor() {
     this.yieldOracle = new YieldOracle();
     this.rebalancer = Rebalancer.getInstance();
     this.gaslessRelayer = new GaslessRelayer();
+    this.apiServer = new ApiServer();
   }
 
   async start(): Promise<void> {
@@ -41,6 +44,11 @@ class Application {
       } else {
         Logger.info('Gasless relayer is disabled in configuration');
       }
+      
+      // Start API server
+      Logger.info('Starting API server...');
+      await this.apiServer.start();
+      Logger.info('API server started');
       
       Logger.info('All backend services started successfully');
       Logger.info(`Environment: ${CONFIG.nodeEnv}`);
