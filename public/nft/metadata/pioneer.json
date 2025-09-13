@@ -1,0 +1,59 @@
+{
+  "name": "Yield Pioneer",
+  "description": "You're a true pioneer in the DeFi space! This badge represents your dedication to yield farming and your significant contribution to the LINE Yield ecosystem. You've proven yourself as an early adopter and active participant.",
+  "image": "https://api.line-yield.com/nft/images/pioneer.png",
+  "animation_url": "https://api.line-yield.com/nft/animations/pioneer.mp4",
+  "external_url": "https://line-yield.com/nft/pioneer",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Pioneer"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Points Required",
+      "value": 1000
+    },
+    {
+      "trait_type": "Max Supply",
+      "value": 2500
+    },
+    {
+      "trait_type": "Category",
+      "value": "Achievement"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Sunset Orange"
+    },
+    {
+      "trait_type": "Symbol",
+      "value": "⭐"
+    },
+    {
+      "trait_type": "Power Level",
+      "value": 3
+    }
+  ],
+  "properties": {
+    "tier": 2,
+    "threshold": 1000,
+    "rarity": "rare",
+    "category": "achievement",
+    "mintable": true,
+    "transferable": true,
+    "burnable": false
+  },
+  "collection": {
+    "name": "LINE Yield NFT Collection",
+    "family": "Yield Farming Badges"
+  },
+  "creator": {
+    "name": "LINE Yield Protocol",
+    "url": "https://line-yield.com"
+  }
+}
+

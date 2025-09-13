@@ -310,3 +310,4 @@ COMMENT ON FUNCTION award_referral_reward IS 'Awards referral rewards and tracks
 COMMENT ON FUNCTION get_referral_stats IS 'Returns comprehensive referral statistics for a user';
 COMMENT ON FUNCTION validate_referral_code IS 'Validates if a referral code exists and returns referrer info';
 COMMENT ON FUNCTION get_referral_leaderboard IS 'Returns the top referrers by referral count and earnings';
+

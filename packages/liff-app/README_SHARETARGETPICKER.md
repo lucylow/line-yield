@@ -389,3 +389,4 @@ For issues or questions regarding this implementation:
 ---
 
 **Note**: This implementation follows LINE's official guidelines and best practices for ShareTargetPicker usage in Mini Apps.
+

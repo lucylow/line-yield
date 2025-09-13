@@ -386,3 +386,4 @@ contract LineYieldPoints is Ownable, ReentrancyGuard, Pausable {
         _unpause();
     }
 }
+

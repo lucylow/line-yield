@@ -477,3 +477,4 @@ For issues or questions regarding the rewards system:
 ---
 
 **Note**: This rewards system is designed to be secure, scalable, and user-friendly. Regular audits and updates ensure optimal performance and security.
+

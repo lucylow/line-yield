@@ -534,3 +534,4 @@ const PurchaseInterface: React.FC<PurchaseInterfaceProps> = ({ onPurchaseComplet
 };
 
 export default PurchaseInterface;
+

@@ -465,3 +465,4 @@ if (DEBUG_MODE) {
 The LINE Mini-Dapp payment integration provides a comprehensive solution for handling both fiat and crypto payments within the Kaia Yield Optimizer. With proper implementation of security measures, webhook handling, and error management, it offers a professional-grade payment experience that integrates seamlessly with the LINE ecosystem.
 
 The system is designed to scale with your application and can easily accommodate new payment methods, currencies, and features as they become available through the LINE DApp Portal.
+

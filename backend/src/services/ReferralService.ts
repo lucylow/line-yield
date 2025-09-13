@@ -3,7 +3,7 @@ import { Logger } from '../utils/logger';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const logger = new Logger('ReferralService');
+const logger = new Logger();
 
 // Initialize Supabase client with service role key (backend only)
 const supabase = createClient(CONFIG.supabase.url, CONFIG.supabase.serviceRoleKey);
@@ -108,10 +108,10 @@ export class ReferralService {
 
       if (error) throw error;
 
-      logger.info(`Generated referral code for user ${normalizedAddress}: ${referralCode}`);
+      Logger.info(`Generated referral code for user ${normalizedAddress}: ${referralCode}`);
       return referralCode;
     } catch (error) {
-      logger.error('Error generating referral code:', error);
+      Logger.error('Error generating referral code:', error);
       throw new Error('Failed to generate referral code');
     }
   }
@@ -170,7 +170,7 @@ export class ReferralService {
       // Award referral rewards
       await this.awardReferralRewards(referrer.wallet_address, normalizedAddress, 'signup');
 
-      logger.info(`Referral redeemed: ${normalizedAddress} referred by ${referrer.wallet_address}`);
+      Logger.info(`Referral redeemed: ${normalizedAddress} referred by ${referrer.wallet_address}`);
       
       return { 
         success: true, 
@@ -178,7 +178,7 @@ export class ReferralService {
         referrerAddress: referrer.wallet_address
       };
     } catch (error) {
-      logger.error('Error redeeming referral code:', error);
+      Logger.error('Error redeeming referral code:', error);
       return { success: false, message: 'Failed to redeem referral code' };
     }
   }
@@ -309,6 +309,9 @@ export class ReferralService {
           referrerPoints,
           { ...metadata, recipient: 'referrer' }
         );
+
+        // Award NFT yield points
+        await this.awardNFTYieldPoints(referrerAddress, referrerPoints, `referral_${rewardType}`);
       }
 
       // Award points to referred user
@@ -320,6 +323,9 @@ export class ReferralService {
           referredPoints,
           { ...metadata, recipient: 'referred' }
         );
+
+        // Award NFT yield points
+        await this.awardNFTYieldPoints(referredAddress, referredPoints, `referral_${rewardType}`);
       }
 
       logger.info(`Referral rewards awarded: ${rewardType} - Referrer: ${referrerPoints}, Referred: ${referredPoints}`);
@@ -491,6 +497,30 @@ export class ReferralService {
     } catch (error) {
       logger.error('Error getting referral leaderboard:', error);
       return [];
+    }
+  }
+
+  /**
+   * Award NFT yield points (integrate with NFT service)
+   */
+  private async awardNFTYieldPoints(
+    userAddress: string, 
+    points: number, 
+    reason: string
+  ): Promise<void> {
+    try {
+      // Import NFT service dynamically to avoid circular dependency
+      const { nftService } = await import('./NFTService');
+      
+      if (nftService.isServiceInitialized()) {
+        await nftService.awardYieldPoints(userAddress, points, reason);
+        logger.info(`Awarded ${points} NFT yield points to ${userAddress} for ${reason}`);
+      } else {
+        logger.warn('NFT service not initialized, skipping NFT yield points award');
+      }
+    } catch (error) {
+      logger.error('Error awarding NFT yield points:', error);
+      // Don't throw error to avoid breaking referral flow
     }
   }
 }

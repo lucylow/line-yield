@@ -15,6 +15,8 @@ import WebMiniDapp from "./pages/WebMiniDapp";
 import MiniDappDemo from "./pages/MiniDappDemo";
 import SecurityAudit from "./pages/SecurityAudit";
 import KaiaLineMiniDapp from "./pages/KaiaLineMiniDapp";
+import TokenManagementPage from "./pages/TokenManagementPage";
+import MultilingualDemoPage from "./pages/MultilingualDemoPage";
 import NotFound from "./pages/NotFound";
 // Mobile-specific pages
 import MobileLanding from "./pages/MobileLanding";
@@ -27,6 +29,10 @@ import { useMobile } from "./hooks/useMobile";
 import { LocalizationProvider } from "@shared/contexts";
 import { usePreventGoBack } from "@shared/hooks";
 import { AppWrapper } from "./components/AppWrapper";
+// New components
+import { DAOGovernancePanel } from "./components/governance/DAOGovernancePanel";
+import { StablecoinSwapPanel } from "./components/swap/StablecoinSwapPanel";
+import "./styles/mobile.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +84,8 @@ const AppContent = () => {
               </LiffProvider>
             } />
             <Route path="/kaia-mini-dapp" element={<KaiaLineMiniDapp />} />
+            <Route path="/token-management" element={<TokenManagementPage />} />
+            <Route path="/multilingual-demo" element={<MultilingualDemoPage />} />
             {/* Redirect other routes to mobile landing */}
             <Route path="*" element={<MobileLanding />} />
           </Routes>
@@ -144,6 +152,32 @@ const AppContent = () => {
             </div>
           } />
           <Route path="/kaia-mini-dapp" element={<KaiaLineMiniDapp />} />
+          <Route path="/token-management" element={<TokenManagementPage />} />
+          <Route path="/multilingual-demo" element={<MultilingualDemoPage />} />
+          <Route path="/governance" element={
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 container mx-auto px-4 py-8">
+                <DAOGovernancePanel 
+                  governanceTokenBalance={15000}
+                  userAddress="0x1234...5678"
+                />
+              </main>
+              <Footer />
+            </div>
+          } />
+          <Route path="/swap" element={
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 container mx-auto px-4 py-8">
+                <StablecoinSwapPanel 
+                  walletBalance={1000}
+                  userAddress="0x1234...5678"
+                />
+              </main>
+              <Footer />
+            </div>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

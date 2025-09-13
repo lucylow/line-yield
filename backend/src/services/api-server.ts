@@ -10,9 +10,11 @@ import { RateLimiterMemory } from 'rate-limiter-flexible';
 // Import route modules
 import rewardsRoutes from '../routes/rewards';
 import referralRoutes from '../routes/referral';
+import nftRoutes from '../routes/nft';
 import lineVerificationRoutes from '../routes/line-verification';
 import richMenuRoutes from '../routes/rich-menu';
 import secureRoutes from '../routes/secure';
+import qrPaymentRoutes from '../routes/qr-payment';
 
 export class ApiServer {
   private app: express.Application;
@@ -112,9 +114,11 @@ export class ApiServer {
     // API routes
     this.app.use('/api/rewards', rewardsRoutes);
     this.app.use('/api/referral', referralRoutes);
+    this.app.use('/api/nft', nftRoutes);
     this.app.use('/api/line', lineVerificationRoutes);
     this.app.use('/api/rich-menu', richMenuRoutes);
     this.app.use('/api/secure', secureRoutes);
+    this.app.use('/api/qr-payment', qrPaymentRoutes);
 
     // API documentation endpoint
     this.app.get('/api', (req, res) => {
@@ -127,9 +131,11 @@ export class ApiServer {
           endpoints: {
             rewards: '/api/rewards',
             referral: '/api/referral',
+            nft: '/api/nft',
             line: '/api/line',
             richMenu: '/api/rich-menu',
             secure: '/api/secure',
+            qrPayment: '/api/qr-payment',
           },
           documentation: 'https://docs.line-yield.com/api',
           support: 'https://support.line-yield.com',
@@ -150,6 +156,7 @@ export class ApiServer {
           '/api/line',
           '/api/rich-menu',
           '/api/secure',
+          '/api/qr-payment',
         ]
       });
     });
@@ -171,6 +178,7 @@ export class ApiServer {
             line: '/api/line',
             richMenu: '/api/rich-menu',
             secure: '/api/secure',
+            qrPayment: '/api/qr-payment',
           }
         }
       });

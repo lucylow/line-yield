@@ -1,0 +1,59 @@
+{
+  "name": "Yield Master",
+  "description": "You've mastered the art of yield farming! This prestigious badge represents your expertise and significant achievements in the LINE Yield ecosystem. You're recognized as a skilled participant who understands the nuances of DeFi.",
+  "image": "https://api.line-yield.com/nft/images/master.png",
+  "animation_url": "https://api.line-yield.com/nft/animations/master.mp4",
+  "external_url": "https://line-yield.com/nft/master",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Master"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Points Required",
+      "value": 2500
+    },
+    {
+      "trait_type": "Max Supply",
+      "value": 1000
+    },
+    {
+      "trait_type": "Category",
+      "value": "Achievement"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Royal Purple"
+    },
+    {
+      "trait_type": "Symbol",
+      "value": "👑"
+    },
+    {
+      "trait_type": "Power Level",
+      "value": 4
+    }
+  ],
+  "properties": {
+    "tier": 3,
+    "threshold": 2500,
+    "rarity": "epic",
+    "category": "achievement",
+    "mintable": true,
+    "transferable": true,
+    "burnable": false
+  },
+  "collection": {
+    "name": "LINE Yield NFT Collection",
+    "family": "Yield Farming Badges"
+  },
+  "creator": {
+    "name": "LINE Yield Protocol",
+    "url": "https://line-yield.com"
+  }
+}
+

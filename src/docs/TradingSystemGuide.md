@@ -401,3 +401,4 @@ const handleTradeError = (error) => {
 The trading system provides a comprehensive solution for token trading on the Kaia ecosystem. With its modular architecture, advanced features, and security measures, it offers users a professional-grade trading experience while maintaining the simplicity and accessibility expected from a LINE Mini-DApp.
 
 The system is designed to scale with the growing Kaia ecosystem and can easily accommodate new tokens, protocols, and trading features as they become available.
+

@@ -207,3 +207,4 @@ export const TradingWithPayments: React.FC<TradingWithPaymentsProps> = ({ classN
 };
 
 export default TradingWithPayments;
+

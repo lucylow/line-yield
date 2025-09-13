@@ -320,3 +320,4 @@ export const ReferralPromotion: React.FC<ReferralPromotionProps> = ({
     </div>
   );
 };
+

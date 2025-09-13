@@ -400,3 +400,4 @@ contract StakingRewards is Ownable, ReentrancyGuard, Pausable {
         poolCount = stakingPools.length;
     }
 }
+

@@ -653,3 +653,4 @@ const TradePage: React.FC<TradePageProps> = ({ onNavigate }) => {
 };
 
 export default TradePage;
+

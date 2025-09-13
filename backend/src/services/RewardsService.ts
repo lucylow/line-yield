@@ -133,6 +133,9 @@ export class RewardsService {
       // Credit points to user
       await this.creditPoints(userId, this.REWARD_CONFIG.SIGNUP_BONUS, 'signup_bonus');
 
+      // Award NFT yield points
+      await this.awardNFTYieldPoints(userId, this.REWARD_CONFIG.SIGNUP_BONUS, 'signup_bonus');
+
       logger.info(`Signup bonus awarded to user ${userId}: ${this.REWARD_CONFIG.SIGNUP_BONUS} points`);
       return data;
     } catch (error) {
@@ -194,6 +197,9 @@ export class RewardsService {
 
       // Credit points to user
       await this.creditPoints(userId, points, 'loyalty');
+
+      // Award NFT yield points
+      await this.awardNFTYieldPoints(userId, points, `loyalty_${activity}`);
 
       logger.info(`Loyalty points awarded to user ${userId}: ${points} points`);
       return data;
@@ -514,6 +520,30 @@ export class RewardsService {
     } catch (error) {
       logger.error('Error getting draw history:', error);
       throw new Error('Failed to get draw history');
+    }
+  }
+
+  /**
+   * Award NFT yield points (integrate with NFT service)
+   */
+  private async awardNFTYieldPoints(
+    userId: string, 
+    points: number, 
+    reason: string
+  ): Promise<void> {
+    try {
+      // Import NFT service dynamically to avoid circular dependency
+      const { nftService } = await import('./NFTService');
+      
+      if (nftService.isServiceInitialized()) {
+        await nftService.awardYieldPoints(userId, points, reason);
+        logger.info(`Awarded ${points} NFT yield points to ${userId} for ${reason}`);
+      } else {
+        logger.warn('NFT service not initialized, skipping NFT yield points award');
+      }
+    } catch (error) {
+      logger.error('Error awarding NFT yield points:', error);
+      // Don't throw error to avoid breaking rewards flow
     }
   }
 }

@@ -583,3 +583,4 @@ export const LINEPaymentIntegration: React.FC<LINEPaymentIntegrationProps> = ({
 };
 
 export default LINEPaymentIntegration;
+

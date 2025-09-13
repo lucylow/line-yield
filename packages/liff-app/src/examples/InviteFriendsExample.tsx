@@ -285,3 +285,4 @@ async function inviteFriends() {
 };
 
 export default InviteFriendsExample;
+

@@ -1,0 +1,59 @@
+{
+  "name": "Yield Novice",
+  "description": "The first step in your DeFi journey! This badge represents your entry into the world of yield farming with LINE Yield. You've taken the first step towards earning passive income through stablecoin yields.",
+  "image": "https://api.line-yield.com/nft/images/novice.png",
+  "animation_url": "https://api.line-yield.com/nft/animations/novice.mp4",
+  "external_url": "https://line-yield.com/nft/novice",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Novice"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Points Required",
+      "value": 100
+    },
+    {
+      "trait_type": "Max Supply",
+      "value": 10000
+    },
+    {
+      "trait_type": "Category",
+      "value": "Achievement"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Forest Green"
+    },
+    {
+      "trait_type": "Symbol",
+      "value": "🌱"
+    },
+    {
+      "trait_type": "Power Level",
+      "value": 1
+    }
+  ],
+  "properties": {
+    "tier": 0,
+    "threshold": 100,
+    "rarity": "common",
+    "category": "achievement",
+    "mintable": true,
+    "transferable": true,
+    "burnable": false
+  },
+  "collection": {
+    "name": "LINE Yield NFT Collection",
+    "family": "Yield Farming Badges"
+  },
+  "creator": {
+    "name": "LINE Yield Protocol",
+    "url": "https://line-yield.com"
+  }
+}
+

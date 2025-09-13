@@ -511,3 +511,4 @@ const CashOutInterface: React.FC<CashOutInterfaceProps> = ({ onCashOutComplete, 
 };
 
 export default CashOutInterface;
+

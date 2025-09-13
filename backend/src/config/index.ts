@@ -69,6 +69,11 @@ export interface AppConfig {
     clientSecret: string;
     apiKey: string;
   };
+  stripe: {
+    secretKey: string;
+    publishableKey: string;
+    webhookSecret: string;
+  };
 }
 
 export interface StrategyConfig {
@@ -182,6 +187,12 @@ export const CONFIG: AppConfig = {
   lovable: {
     clientSecret: process.env['LOVABLE_CLIENT_SECRET'] || '',
     apiKey: process.env['LOVABLE_API_KEY'] || ''
+  },
+  
+  stripe: {
+    secretKey: process.env['STRIPE_SECRET_KEY'] || '',
+    publishableKey: process.env['STRIPE_PUBLISHABLE_KEY'] || '',
+    webhookSecret: process.env['STRIPE_WEBHOOK_SECRET'] || ''
   }
 };
 

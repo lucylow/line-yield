@@ -1,0 +1,59 @@
+{
+  "name": "Yield Titan",
+  "description": "You are a true titan of DeFi! This ultra-rare badge represents the absolute pinnacle of achievement in the LINE Yield ecosystem. You've transcended beyond mastery to become a legendary figure whose name will be remembered in the annals of yield farming history.",
+  "image": "https://api.line-yield.com/nft/images/titan.png",
+  "animation_url": "https://api.line-yield.com/nft/animations/titan.mp4",
+  "external_url": "https://line-yield.com/nft/titan",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Titan"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Points Required",
+      "value": 10000
+    },
+    {
+      "trait_type": "Max Supply",
+      "value": 100
+    },
+    {
+      "trait_type": "Category",
+      "value": "Achievement"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Cosmic Red"
+    },
+    {
+      "trait_type": "Symbol",
+      "value": "💎"
+    },
+    {
+      "trait_type": "Power Level",
+      "value": 6
+    }
+  ],
+  "properties": {
+    "tier": 5,
+    "threshold": 10000,
+    "rarity": "legendary",
+    "category": "achievement",
+    "mintable": true,
+    "transferable": true,
+    "burnable": false
+  },
+  "collection": {
+    "name": "LINE Yield NFT Collection",
+    "family": "Yield Farming Badges"
+  },
+  "creator": {
+    "name": "LINE Yield Protocol",
+    "url": "https://line-yield.com"
+  }
+}
+

@@ -545,3 +545,4 @@ export const RewardsDashboard: React.FC<RewardsDashboardProps> = ({ className = 
 };
 
 export default RewardsDashboard;
+

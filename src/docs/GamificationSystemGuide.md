@@ -397,3 +397,4 @@ if (DEBUG_MODE) {
 The LINE YIELD gamification system provides a comprehensive solution for user engagement and retention. With its robust smart contract foundation, flexible backend services, and intuitive frontend components, it creates an engaging experience that rewards users for their participation in the ecosystem.
 
 The system is designed to scale with your application and can easily accommodate new reward mechanisms, additional earning methods, and enhanced features as your user base grows.
+

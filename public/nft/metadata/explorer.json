@@ -1,0 +1,59 @@
+{
+  "name": "Yield Explorer",
+  "description": "You're exploring the vast landscape of DeFi! This badge shows you've gained experience in yield farming and are actively participating in the LINE Yield ecosystem. Your journey to becoming a yield master has begun.",
+  "image": "https://api.line-yield.com/nft/images/explorer.png",
+  "animation_url": "https://api.line-yield.com/nft/animations/explorer.mp4",
+  "external_url": "https://line-yield.com/nft/explorer",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Explorer"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Points Required",
+      "value": 500
+    },
+    {
+      "trait_type": "Max Supply",
+      "value": 5000
+    },
+    {
+      "trait_type": "Category",
+      "value": "Achievement"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Ocean Blue"
+    },
+    {
+      "trait_type": "Symbol",
+      "value": "🚀"
+    },
+    {
+      "trait_type": "Power Level",
+      "value": 2
+    }
+  ],
+  "properties": {
+    "tier": 1,
+    "threshold": 500,
+    "rarity": "common",
+    "category": "achievement",
+    "mintable": true,
+    "transferable": true,
+    "burnable": false
+  },
+  "collection": {
+    "name": "LINE Yield NFT Collection",
+    "family": "Yield Farming Badges"
+  },
+  "creator": {
+    "name": "LINE Yield Protocol",
+    "url": "https://line-yield.com"
+  }
+}
+

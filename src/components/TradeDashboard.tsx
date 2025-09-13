@@ -370,3 +370,4 @@ const TradeDashboard: React.FC<TradeDashboardProps> = ({ className }) => {
 };
 
 export default TradeDashboard;
+

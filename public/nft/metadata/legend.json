@@ -1,0 +1,59 @@
+{
+  "name": "Yield Legend",
+  "description": "You're a legend in the DeFi community! This exclusive badge represents your exceptional achievements and legendary status in the LINE Yield ecosystem. You've reached the pinnacle of yield farming expertise and are recognized by your peers.",
+  "image": "https://api.line-yield.com/nft/images/legend.png",
+  "animation_url": "https://api.line-yield.com/nft/animations/legend.mp4",
+  "external_url": "https://line-yield.com/nft/legend",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Legend"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Points Required",
+      "value": 5000
+    },
+    {
+      "trait_type": "Max Supply",
+      "value": 500
+    },
+    {
+      "trait_type": "Category",
+      "value": "Achievement"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Golden Yellow"
+    },
+    {
+      "trait_type": "Symbol",
+      "value": "🏆"
+    },
+    {
+      "trait_type": "Power Level",
+      "value": 5
+    }
+  ],
+  "properties": {
+    "tier": 4,
+    "threshold": 5000,
+    "rarity": "epic",
+    "category": "achievement",
+    "mintable": true,
+    "transferable": true,
+    "burnable": false
+  },
+  "collection": {
+    "name": "LINE Yield NFT Collection",
+    "family": "Yield Farming Badges"
+  },
+  "creator": {
+    "name": "LINE Yield Protocol",
+    "url": "https://line-yield.com"
+  }
+}
+

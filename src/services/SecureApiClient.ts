@@ -308,3 +308,4 @@ export class SecureApiClient {
 
 // Export singleton instance
 export const secureApiClient = SecureApiClient.getInstance();
+

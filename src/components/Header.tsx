@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LineChart, Wallet, Settings, User } from 'lucide-react';
+import { LineChart, Wallet, Settings, User, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWallet } from '@/hooks/useWallet';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -61,6 +61,16 @@ export const Header = () => {
               }`}
             >
               Dashboard
+            </Link>
+            <Link 
+              to="/qr-payment" 
+              className={`font-medium transition-colors relative after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-emerald-400 after:to-emerald-500 after:transition-all hover:after:w-full ${
+                location.pathname === '/qr-payment' 
+                  ? 'text-green-600 after:w-full' 
+                  : 'text-gray-700 hover:text-green-600'
+              }`}
+            >
+              QR Payments
             </Link>
             <a 
               href="#features" 
