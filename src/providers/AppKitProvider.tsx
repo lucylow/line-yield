@@ -3,7 +3,38 @@ import { createAppKit } from '@reown/appkit/react';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { mainnet, arbitrum, polygon, base } from '@reown/appkit/networks';
+// Define networks manually since @reown/appkit/networks might not be available
+const mainnet = {
+  id: 1,
+  name: 'Ethereum',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: { default: { http: ['https://cloudflare-eth.com'] } },
+  blockExplorers: { default: { name: 'Etherscan', url: 'https://etherscan.io' } },
+} as const;
+
+const arbitrum = {
+  id: 42161,
+  name: 'Arbitrum One',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: { default: { http: ['https://arb1.arbitrum.io/rpc'] } },
+  blockExplorers: { default: { name: 'Arbiscan', url: 'https://arbiscan.io' } },
+} as const;
+
+const polygon = {
+  id: 137,
+  name: 'Polygon',
+  nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+  rpcUrls: { default: { http: ['https://polygon-rpc.com'] } },
+  blockExplorers: { default: { name: 'PolygonScan', url: 'https://polygonscan.com' } },
+} as const;
+
+const base = {
+  id: 8453,
+  name: 'Base',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: { default: { http: ['https://mainnet.base.org'] } },
+  blockExplorers: { default: { name: 'BaseScan', url: 'https://basescan.org' } },
+} as const;
 
 // Define Kaia network since it might not be in the default networks
 const kaia = {
