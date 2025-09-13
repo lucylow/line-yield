@@ -331,3 +331,5 @@ if (typeof window !== 'undefined') {
 
 export { LiffFriendPromptService };
 export default initializeLiffApp;
+
+

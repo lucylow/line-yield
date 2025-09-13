@@ -387,3 +387,5 @@ If you encounter issues:
 ---
 
 **Remember**: The Dapp Portal URL (`https://liff.line.me/2006533014-8gD06D64`) is mandatory in Area D and cannot be changed. This ensures compliance with Kaia Wave Mini Dapp guidelines.
+
+

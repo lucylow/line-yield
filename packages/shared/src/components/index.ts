@@ -7,3 +7,4 @@ export { PaymentFlow } from './PaymentFlow';
 export { ConnectWallet } from './ConnectWallet';
 export { BalanceDisplay } from './BalanceDisplay';
 export { TransactionHistory } from './TransactionHistory';
+export { WelcomeBanner } from './WelcomeBanner';

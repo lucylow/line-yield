@@ -1,0 +1,75 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00C300;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00A000;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#008000;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8f9fa;stop-opacity:0.95" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="200" cy="150" r="80" fill="#ffffff" opacity="0.1"/>
+  <circle cx="1000" cy="480" r="120" fill="#ffffff" opacity="0.08"/>
+  <circle cx="900" cy="100" r="60" fill="#ffffff" opacity="0.12"/>
+  
+  <!-- Main Card -->
+  <rect x="100" y="100" width="1000" height="430" rx="24" fill="url(#cardGradient)" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- LINE Logo Area -->
+  <rect x="150" y="150" width="80" height="80" rx="16" fill="#00C300"/>
+  <text x="190" y="200" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#ffffff" text-anchor="middle">L</text>
+  
+  <!-- Title -->
+  <text x="280" y="200" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#1a1a1a">LINE Yield</text>
+  <text x="280" y="240" font-family="Arial, sans-serif" font-size="24" fill="#666666">Mini Dapp</text>
+  
+  <!-- Description -->
+  <text x="150" y="300" font-family="Arial, sans-serif" font-size="28" fill="#333333">Seamless DeFi experience inside LINE Messenger</text>
+  <text x="150" y="340" font-family="Arial, sans-serif" font-size="24" fill="#666666">Powered by Kaia Blockchain</text>
+  
+  <!-- Features -->
+  <g transform="translate(150, 380)">
+    <!-- Feature 1 -->
+    <circle cx="20" cy="20" r="12" fill="#00C300"/>
+    <text x="20" y="26" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">8.64%</text>
+    <text x="50" y="26" font-family="Arial, sans-serif" font-size="20" fill="#333333">APY on USDT</text>
+    
+    <!-- Feature 2 -->
+    <circle cx="20" cy="60" r="12" fill="#0066CC"/>
+    <text x="20" y="66" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">⚡</text>
+    <text x="50" y="66" font-family="Arial, sans-serif" font-size="20" fill="#333333">Automated Yield</text>
+    
+    <!-- Feature 3 -->
+    <circle cx="20" cy="100" r="12" fill="#8B5CF6"/>
+    <text x="20" y="106" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">🔒</text>
+    <text x="50" y="106" font-family="Arial, sans-serif" font-size="20" fill="#333333">Secure & Trusted</text>
+  </g>
+  
+  <!-- Right Side - Visual Elements -->
+  <g transform="translate(800, 200)">
+    <!-- DeFi Icons -->
+    <rect x="0" y="0" width="60" height="60" rx="12" fill="#00C300" opacity="0.1"/>
+    <text x="30" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">💰</text>
+    
+    <rect x="80" y="0" width="60" height="60" rx="12" fill="#0066CC" opacity="0.1"/>
+    <text x="110" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">📈</text>
+    
+    <rect x="160" y="0" width="60" height="60" rx="12" fill="#8B5CF6" opacity="0.1"/>
+    <text x="190" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">🔄</text>
+    
+    <!-- Connection Lines -->
+    <line x1="30" y1="60" x2="110" y2="60" stroke="#00C300" stroke-width="3" opacity="0.3"/>
+    <line x1="110" y1="60" x2="190" y2="60" stroke="#0066CC" stroke-width="3" opacity="0.3"/>
+  </g>
+  
+  <!-- Bottom Text -->
+  <text x="600" y="580" font-family="Arial, sans-serif" font-size="20" fill="#ffffff" text-anchor="middle" opacity="0.9">Available on LINE Messenger</text>
+</svg>

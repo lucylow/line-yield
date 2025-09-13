@@ -5,6 +5,7 @@ import { LiffProvider } from './providers/LiffProvider';
 import { Layout, Button } from '../../shared/src';
 import { useUniversalWallet, useLineYield } from '../../shared/src';
 import PaymentDemo from './components/PaymentDemo';
+import InviteFriends from './components/InviteFriends';
 
 const queryClient = new QueryClient();
 
@@ -163,6 +164,16 @@ const YieldDashboard: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Invite Friends Section */}
+        {isLiff && (
+          <div className="mt-8">
+            <InviteFriends 
+              userYield={vaultData?.userYield}
+              currentAPY={vaultData?.currentAPY}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

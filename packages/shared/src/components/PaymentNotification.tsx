@@ -164,3 +164,5 @@ export const PaymentToast: React.FC<PaymentNotificationProps> = ({
     <PaymentNotification status={status} onClose={onClose} />
   );
 };
+
+

@@ -24,6 +24,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { miniDappSDK } from '../services/MiniDappSDK';
+import { useMiniDappTitle } from '../../packages/shared/src/hooks';
 
 interface UserData {
   connected: boolean;
@@ -50,6 +51,9 @@ interface Strategy {
 }
 
 const WebMiniDapp: React.FC = () => {
+  // Set proper Mini Dapp title
+  useMiniDappTitle('LINE Yield');
+  
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [walletType, setWalletType] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
@@ -489,3 +493,4 @@ const WebMiniDapp: React.FC = () => {
 };
 
 export default WebMiniDapp;
+

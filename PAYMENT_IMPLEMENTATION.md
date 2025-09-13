@@ -356,3 +356,5 @@ When extending the payment functionality:
 - [Payment Policy Guidelines](https://docs.dappportal.io/mini-dapp/mini-dapp-sdk/payment/policy/payment)
 - [Refund Policy Requirements](https://docs.dappportal.io/mini-dapp/mini-dapp-sdk/payment/policy/refund)
 - [Successful Mini Dapp Guide](https://docs.dappportal.io/lines-mini-dapp-and-dapp-portal/how-to-build-successful-mini-dapp)
+
+

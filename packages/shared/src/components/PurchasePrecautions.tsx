@@ -139,3 +139,5 @@ export const PurchasePrecautions: React.FC<PurchasePrecautionsProps> = ({
     </div>
   );
 };
+
+

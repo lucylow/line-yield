@@ -144,3 +144,5 @@ export async function getWalletBalance(address: string, currency: string = 'USDT
     return '0';
   }
 }
+
+

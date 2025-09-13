@@ -27,6 +27,7 @@ import { miniDappSDK } from '../services/MiniDappSDK';
 import { useLiff } from '../hooks/useLiff';
 import { PaymentHistoryModal } from '../components/PaymentHistoryModal';
 import { Transaction } from '../types/vault';
+import { useMiniDappTitle } from '../../packages/shared/src/hooks';
 
 interface UserData {
   connected: boolean;
@@ -54,6 +55,9 @@ interface Strategy {
 
 const LineMiniDapp: React.FC = () => {
   const { isInitialized, user, error: liffError } = useLiff();
+  
+  // Set proper Mini Dapp title
+  useMiniDappTitle('LINE Yield');
   const [userConsent, setUserConsent] = useState(false);
   const [hasAddedOA, setHasAddedOA] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);

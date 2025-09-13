@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../utils/cn';
+import { useT, useDateFormat } from '../hooks';
 
 interface Transaction {
   id: string;
@@ -20,15 +21,8 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   transactions = [],
   className = ''
 }) => {
-  const formatDate = (timestamp: Date | number) => {
-    const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp;
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
-  };
+  const t = useT();
+  const formatDate = useDateFormat();
 
   const getStatusColor = (status: Transaction['status']) => {
     switch (status) {
@@ -94,8 +88,8 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-1">No transactions yet</h3>
-        <p className="text-gray-500">Your transaction history will appear here</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-1">{t('noTransactions')}</h3>
+        <p className="text-gray-500">{t('transactionHistoryDescription')}</p>
       </div>
     );
   }
@@ -103,7 +97,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   return (
     <div className={cn('bg-white rounded-lg shadow', className)}>
       <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900">Transaction History</h3>
+        <h3 className="text-lg font-medium text-gray-900">{t('transactionHistory')}</h3>
       </div>
       
       <div className="divide-y divide-gray-200">
@@ -115,7 +109,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-900 capitalize">
-                  {tx.type}
+                  {t(`transactionType${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}`)}
                 </p>
                 <p className="text-sm text-gray-500">
                   {formatDate(tx.timestamp)}
@@ -125,10 +119,10 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             
             <div className="text-right">
               <p className={cn('text-sm font-medium', getTypeColor(tx.type))}>
-                {tx.type === 'deposit' ? '+' : tx.type === 'withdraw' ? '-' : '+'}{tx.amount} {tx.token || 'USDC'}
+                {tx.type === 'deposit' ? '+' : tx.type === 'withdraw' ? '-' : '+'}{tx.amount} {tx.token || t('currencyUsdc')}
               </p>
               <span className={cn('inline-flex px-2 py-1 text-xs font-medium rounded-full', getStatusColor(tx.status))}>
-                {tx.status === 'completed' ? 'confirmed' : tx.status}
+                {tx.status === 'completed' ? t('statusConfirmed') : t(`status${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}`)}
               </span>
             </div>
           </div>

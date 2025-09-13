@@ -255,3 +255,5 @@ If you need help:
 ---
 
 **Remember**: The "Add friend option" aggressive setting is **manually configured** in LINE Developers Console, while the friend prompting code is **programmatically implemented** in your LIFF app. Both work together to provide the best user experience!
+
+

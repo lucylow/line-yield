@@ -198,3 +198,4 @@ Both Mini Dapp versions follow LINE's official guidelines:
 - **Web Version**: Optimized for web browsers with immediate wallet connection
 
 The implementation provides a seamless user experience while respecting the different requirements of each platform.
+

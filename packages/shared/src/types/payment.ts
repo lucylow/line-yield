@@ -49,3 +49,5 @@ export interface PurchaseAgreement {
   agreedNonRefund: boolean;
   agreedEncryptedInfo: boolean;
 }
+
+

@@ -288,3 +288,5 @@ export const LineFriendPrompt: React.FC<LineFriendPromptProps> = ({
 };
 
 export default LineFriendPrompt;
+
+
