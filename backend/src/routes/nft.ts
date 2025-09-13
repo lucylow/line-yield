@@ -1,388 +1,515 @@
-import { Router, Request, Response } from 'express';
-import { nftService } from '../services/NFTService';
+import express from 'express';
+import { nftCollateralService, BorrowRequest, RepayRequest, LiquidationRequest } from '../services/nft-collateral-service';
 import { Logger } from '../utils/logger';
-import rateLimit from 'express-rate-limit';
-import { CONFIG } from '../config';
+import { validateAddress } from '../utils/validation';
 
-const logger = new Logger('NFTRoutes');
-const router = Router();
-
-// Rate limiting for NFT endpoints
-const nftRateLimit = rateLimit({
-  windowMs: CONFIG.security.rateLimitWindowMs,
-  max: CONFIG.security.rateLimitMaxRequests,
-  message: {
-    error: 'Too many requests from this IP, please try again later.',
-    retryAfter: Math.ceil(CONFIG.security.rateLimitWindowMs / 1000)
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Middleware to validate user address
-const validateUserAddress = (req: Request, res: Response, next: any) => {
-  const { address } = req.params;
-  
-  if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
-    return res.status(400).json({
-      success: false,
-      error: 'Invalid wallet address format'
-    });
-  }
-
-  next();
-};
+const router = express.Router();
 
 /**
- * GET /api/nft/tiers
- * Get all NFT tiers information
+ * Get user's NFT collateral positions
+ * GET /api/nft/positions/:userAddress
  */
-router.get('/tiers', nftRateLimit, async (req: Request, res: Response) => {
+router.get('/positions/:userAddress', async (req, res) => {
   try {
-    const tiers = await nftService.getAllTiers();
-    
+    const { userAddress } = req.params;
+
+    if (!validateAddress(userAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid address format',
+      });
+    }
+
+    const positions = await nftCollateralService.getUserPositions(userAddress);
+
     res.json({
       success: true,
-      data: tiers
+      data: positions,
     });
   } catch (error) {
-    logger.error('Error getting NFT tiers:', error);
+    Logger.error('Failed to get user positions', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get NFT tiers'
+      error: 'Failed to get user positions',
     });
   }
 });
 
 /**
- * GET /api/nft/user/:address/collection
- * Get user's NFT collection
+ * Get specific position details
+ * GET /api/nft/position/:positionId
  */
-router.get('/user/:address/collection', 
-  nftRateLimit, 
-  validateUserAddress,
-  async (req: Request, res: Response) => {
-    try {
-      const { address } = req.params;
-      const collection = await nftService.getUserNFTCollection(address);
-      
-      res.json({
-        success: true,
-        data: collection
-      });
-    } catch (error) {
-      logger.error('Error getting user NFT collection:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to get user NFT collection'
-      });
-    }
-  }
-);
-
-/**
- * GET /api/nft/user/:address/tier
- * Get user's current tier information
- */
-router.get('/user/:address/tier', 
-  nftRateLimit, 
-  validateUserAddress,
-  async (req: Request, res: Response) => {
-    try {
-      const { address } = req.params;
-      const tierInfo = await nftService.getUserTierInfo(address);
-      
-      res.json({
-        success: true,
-        data: tierInfo
-      });
-    } catch (error) {
-      logger.error('Error getting user tier info:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to get user tier info'
-      });
-    }
-  }
-);
-
-/**
- * GET /api/nft/user/:address/points
- * Get user's yield points balance
- */
-router.get('/user/:address/points', 
-  nftRateLimit, 
-  validateUserAddress,
-  async (req: Request, res: Response) => {
-    try {
-      const { address } = req.params;
-      const points = await nftService.getUserYieldPoints(address);
-      
-      res.json({
-        success: true,
-        data: {
-          address,
-          yieldPoints: points
-        }
-      });
-    } catch (error) {
-      logger.error('Error getting user yield points:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to get user yield points'
-      });
-    }
-  }
-);
-
-/**
- * GET /api/nft/user/:address/can-mint
- * Check if user can mint NFT
- */
-router.get('/user/:address/can-mint', 
-  nftRateLimit, 
-  validateUserAddress,
-  async (req: Request, res: Response) => {
-    try {
-      const { address } = req.params;
-      const canMint = await nftService.canUserMintNFT(address);
-      
-      res.json({
-        success: true,
-        data: canMint
-      });
-    } catch (error) {
-      logger.error('Error checking if user can mint NFT:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to check mint eligibility'
-      });
-    }
-  }
-);
-
-/**
- * GET /api/nft/user/:address/history
- * Get user's yield points history
- */
-router.get('/user/:address/history', 
-  nftRateLimit, 
-  validateUserAddress,
-  async (req: Request, res: Response) => {
-    try {
-      const { address } = req.params;
-      const { limit = 50 } = req.query;
-      
-      const history = await nftService.getUserYieldPointsHistory(
-        address, 
-        parseInt(limit as string)
-      );
-      
-      res.json({
-        success: true,
-        data: history
-      });
-    } catch (error) {
-      logger.error('Error getting user yield points history:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to get user yield points history'
-      });
-    }
-  }
-);
-
-/**
- * POST /api/nft/award-points
- * Award yield points to user (admin only)
- */
-router.post('/award-points', nftRateLimit, async (req: Request, res: Response) => {
+router.get('/position/:positionId', async (req, res) => {
   try {
-    const { userAddress, points, reason } = req.body;
-    
-    if (!userAddress || !points || points <= 0) {
+    const { positionId } = req.params;
+
+    if (!positionId) {
       return res.status(400).json({
         success: false,
-        error: 'Missing or invalid parameters: userAddress, points'
+        error: 'Position ID is required',
       });
     }
 
-    if (!/^0x[a-fA-F0-9]{40}$/.test(userAddress)) {
-      return res.status(400).json({
+    const position = await nftCollateralService.getPosition(positionId);
+
+    if (!position) {
+      return res.status(404).json({
         success: false,
-        error: 'Invalid wallet address format'
+        error: 'Position not found',
       });
     }
 
-    await nftService.awardYieldPoints(userAddress, points, reason || 'admin_reward');
-    
     res.json({
       success: true,
-      message: `Awarded ${points} yield points to ${userAddress}`,
+      data: position,
+    });
+  } catch (error) {
+    Logger.error('Failed to get position', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get position',
+    });
+  }
+});
+
+/**
+ * Get supported NFT collections
+ * GET /api/nft/collections
+ */
+router.get('/collections', async (req, res) => {
+  try {
+    const collections = await nftCollateralService.getSupportedCollections();
+
+    res.json({
+      success: true,
+      data: collections,
+    });
+  } catch (error) {
+    Logger.error('Failed to get supported collections', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get supported collections',
+    });
+  }
+});
+
+/**
+ * Get user's NFT ownership
+ * GET /api/nft/ownership/:userAddress
+ */
+router.get('/ownership/:userAddress', async (req, res) => {
+  try {
+    const { userAddress } = req.params;
+
+    if (!validateAddress(userAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid address format',
+      });
+    }
+
+    const nfts = await nftCollateralService.getUserNFTs(userAddress);
+
+    res.json({
+      success: true,
+      data: nfts,
+    });
+  } catch (error) {
+    Logger.error('Failed to get user NFTs', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get user NFTs',
+    });
+  }
+});
+
+/**
+ * Get NFT value from oracle
+ * GET /api/nft/value/:nftContract/:tokenId
+ */
+router.get('/value/:nftContract/:tokenId', async (req, res) => {
+  try {
+    const { nftContract, tokenId } = req.params;
+
+    if (!validateAddress(nftContract)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid NFT contract address',
+      });
+    }
+
+    const value = await nftCollateralService.getNFTValue(nftContract, tokenId);
+
+    res.json({
+      success: true,
       data: {
+        nftContract,
+        tokenId,
+        value,
+      },
+    });
+  } catch (error) {
+    Logger.error('Failed to get NFT value', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get NFT value',
+    });
+  }
+});
+
+/**
+ * Calculate maximum borrow amount for NFT
+ * GET /api/nft/max-borrow/:nftContract/:tokenId
+ */
+router.get('/max-borrow/:nftContract/:tokenId', async (req, res) => {
+  try {
+    const { nftContract, tokenId } = req.params;
+
+    if (!validateAddress(nftContract)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid NFT contract address',
+      });
+    }
+
+    const maxBorrow = await nftCollateralService.calculateMaxBorrow(nftContract, tokenId);
+
+    res.json({
+      success: true,
+      data: {
+        nftContract,
+        tokenId,
+        maxBorrow,
+      },
+    });
+  } catch (error) {
+    Logger.error('Failed to calculate max borrow', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate max borrow',
+    });
+  }
+});
+
+/**
+ * Check if position is liquidatable
+ * GET /api/nft/liquidatable/:positionId
+ */
+router.get('/liquidatable/:positionId', async (req, res) => {
+  try {
+    const { positionId } = req.params;
+
+    if (!positionId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Position ID is required',
+      });
+    }
+
+    const liquidatable = await nftCollateralService.isPositionLiquidatable(positionId);
+
+    res.json({
+      success: true,
+      data: {
+        positionId,
+        liquidatable,
+      },
+    });
+  } catch (error) {
+    Logger.error('Failed to check liquidation status', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to check liquidation status',
+    });
+  }
+});
+
+/**
+ * Get vault statistics
+ * GET /api/nft/vault-stats
+ */
+router.get('/vault-stats', async (req, res) => {
+  try {
+    const stats = await nftCollateralService.getVaultStats();
+
+    res.json({
+      success: true,
+      data: stats,
+    });
+  } catch (error) {
+    Logger.error('Failed to get vault stats', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get vault stats',
+    });
+  }
+});
+
+/**
+ * Get liquidation parameters
+ * GET /api/nft/liquidation-params
+ */
+router.get('/liquidation-params', async (req, res) => {
+  try {
+    const params = await nftCollateralService.getLiquidationParameters();
+
+    res.json({
+      success: true,
+      data: params,
+    });
+  } catch (error) {
+    Logger.error('Failed to get liquidation parameters', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get liquidation parameters',
+    });
+  }
+});
+
+/**
+ * Calculate liquidation amount
+ * POST /api/nft/calculate-liquidation
+ */
+router.post('/calculate-liquidation', async (req, res) => {
+  try {
+    const { collateralValue, totalDebt } = req.body;
+
+    if (!collateralValue || !totalDebt) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: collateralValue, totalDebt',
+      });
+    }
+
+    const liquidationAmount = await nftCollateralService.calculateLiquidationAmount(
+      collateralValue,
+      totalDebt
+    );
+
+    res.json({
+      success: true,
+      data: {
+        collateralValue,
+        totalDebt,
+        liquidationAmount,
+      },
+    });
+  } catch (error) {
+    Logger.error('Failed to calculate liquidation amount', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate liquidation amount',
+    });
+  }
+});
+
+/**
+ * Update NFT price (admin only)
+ * POST /api/nft/update-price
+ */
+router.post('/update-price', async (req, res) => {
+  try {
+    const { nftContract, tokenId, price } = req.body;
+
+    if (!nftContract || !tokenId || !price) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: nftContract, tokenId, price',
+      });
+    }
+
+    if (!validateAddress(nftContract)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid NFT contract address',
+      });
+    }
+
+    await nftCollateralService.updateNFTPrice(nftContract, tokenId, price);
+
+    res.json({
+      success: true,
+      message: 'NFT price updated successfully',
+    });
+  } catch (error) {
+    Logger.error('Failed to update NFT price', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update NFT price',
+    });
+  }
+});
+
+/**
+ * Update collection floor price (admin only)
+ * POST /api/nft/update-floor-price
+ */
+router.post('/update-floor-price', async (req, res) => {
+  try {
+    const { nftContract, floorPrice } = req.body;
+
+    if (!nftContract || !floorPrice) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: nftContract, floorPrice',
+      });
+    }
+
+    if (!validateAddress(nftContract)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid NFT contract address',
+      });
+    }
+
+    await nftCollateralService.updateFloorPrice(nftContract, floorPrice);
+
+    res.json({
+      success: true,
+      message: 'Floor price updated successfully',
+    });
+  } catch (error) {
+    Logger.error('Failed to update floor price', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update floor price',
+    });
+  }
+});
+
+/**
+ * Add NFT collection (admin only)
+ * POST /api/nft/add-collection
+ */
+router.post('/add-collection', async (req, res) => {
+  try {
+    const { nftContract, maxLTV, liquidationThreshold, interestRate } = req.body;
+
+    if (!nftContract || maxLTV === undefined || liquidationThreshold === undefined || interestRate === undefined) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: nftContract, maxLTV, liquidationThreshold, interestRate',
+      });
+    }
+
+    if (!validateAddress(nftContract)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid NFT contract address',
+      });
+    }
+
+    if (maxLTV > 10000 || liquidationThreshold > 10000 || interestRate > 10000) {
+      return res.status(400).json({
+        success: false,
+        error: 'Parameters cannot exceed 10000 basis points',
+      });
+    }
+
+    await nftCollateralService.addCollection(nftContract, maxLTV, liquidationThreshold, interestRate);
+
+    res.json({
+      success: true,
+      message: 'NFT collection added successfully',
+    });
+  } catch (error) {
+    Logger.error('Failed to add collection', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to add collection',
+    });
+  }
+});
+
+/**
+ * Mock borrow transaction (for testing)
+ * POST /api/nft/mock-borrow
+ */
+router.post('/mock-borrow', async (req, res) => {
+  try {
+    const { nftContract, tokenId, borrowAmount, userAddress } = req.body;
+
+    if (!nftContract || !tokenId || !borrowAmount || !userAddress) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: nftContract, tokenId, borrowAmount, userAddress',
+      });
+    }
+
+    if (!validateAddress(nftContract) || !validateAddress(userAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid address format',
+      });
+    }
+
+    // Mock position creation
+    const positionId = `mock-${Date.now()}`;
+    const mockPosition = {
+      positionId,
+      owner: userAddress,
+      nftContract,
+      tokenId,
+      collateralValue: (parseFloat(borrowAmount) * 1.5).toString(), // Mock 150% collateral
+      loanAmount: borrowAmount,
+      interestAccrued: '0',
+      lastInterestUpdate: Date.now(),
+      createdAt: Date.now(),
+      active: true,
+      liquidated: false,
+    };
+
+    res.json({
+      success: true,
+      message: 'Mock borrow transaction created',
+      data: mockPosition,
+    });
+  } catch (error) {
+    Logger.error('Failed to create mock borrow', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create mock borrow',
+    });
+  }
+});
+
+/**
+ * Mock repay transaction (for testing)
+ * POST /api/nft/mock-repay
+ */
+router.post('/mock-repay', async (req, res) => {
+  try {
+    const { positionId, repayAmount, userAddress } = req.body;
+
+    if (!positionId || !repayAmount || !userAddress) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: positionId, repayAmount, userAddress',
+      });
+    }
+
+    if (!validateAddress(userAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid address format',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Mock repay transaction processed',
+      data: {
+        positionId,
+        repayAmount,
         userAddress,
-        points,
-        reason: reason || 'admin_reward'
-      }
+        repaidAt: Date.now(),
+      },
     });
   } catch (error) {
-    logger.error('Error awarding yield points:', error);
+    Logger.error('Failed to process mock repay', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to award yield points'
-    });
-  }
-});
-
-/**
- * POST /api/nft/batch-award-points
- * Batch award yield points to multiple users (admin only)
- */
-router.post('/batch-award-points', nftRateLimit, async (req: Request, res: Response) => {
-  try {
-    const { users, points, reason } = req.body;
-    
-    if (!users || !Array.isArray(users) || !points || !Array.isArray(points)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing or invalid parameters: users (array), points (array)'
-      });
-    }
-
-    if (users.length !== points.length) {
-      return res.status(400).json({
-        success: false,
-        error: 'Users and points arrays must have the same length'
-      });
-    }
-
-    // Validate all addresses
-    for (const address of users) {
-      if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
-        return res.status(400).json({
-          success: false,
-          error: `Invalid wallet address format: ${address}`
-        });
-      }
-    }
-
-    await nftService.batchAwardYieldPoints(users, points, reason || 'batch_reward');
-    
-    res.json({
-      success: true,
-      message: `Batch awarded yield points to ${users.length} users`,
-      data: {
-        userCount: users.length,
-        reason: reason || 'batch_reward'
-      }
-    });
-  } catch (error) {
-    logger.error('Error batch awarding yield points:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to batch award yield points'
-    });
-  }
-});
-
-/**
- * POST /api/nft/mint-reward
- * Prepare NFT mint transaction for user
- */
-router.post('/mint-reward', nftRateLimit, async (req: Request, res: Response) => {
-  try {
-    const { userAddress } = req.body;
-    
-    if (!userAddress || !/^0x[a-fA-F0-9]{40}$/.test(userAddress)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid wallet address format'
-      });
-    }
-
-    const mintResult = await nftService.mintNFTReward(userAddress);
-    
-    if (!mintResult.success) {
-      return res.status(400).json({
-        success: false,
-        error: mintResult.error
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'NFT mint transaction prepared',
-      data: {
-        userAddress,
-        tier: mintResult.tier,
-        tierName: mintResult.tierName,
-        contractAddress: nftService.getContractAddress(),
-        // In a real implementation, you would return the transaction data
-        // for the user to sign with their wallet
-        transactionData: {
-          to: nftService.getContractAddress(),
-          data: '0x', // This would be the encoded function call
-          value: '0x0'
-        }
-      }
-    });
-  } catch (error) {
-    logger.error('Error preparing NFT mint transaction:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to prepare NFT mint transaction'
-    });
-  }
-});
-
-/**
- * GET /api/nft/config
- * Get NFT tier configuration
- */
-router.get('/config', nftRateLimit, async (req: Request, res: Response) => {
-  try {
-    const config = nftService.getNFTTierConfig();
-    
-    res.json({
-      success: true,
-      data: {
-        tiers: config,
-        contractAddress: nftService.getContractAddress(),
-        isInitialized: nftService.isServiceInitialized()
-      }
-    });
-  } catch (error) {
-    logger.error('Error getting NFT config:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get NFT config'
-    });
-  }
-});
-
-/**
- * GET /api/nft/health
- * Health check endpoint for NFT service
- */
-router.get('/health', async (req: Request, res: Response) => {
-  try {
-    const isInitialized = nftService.isServiceInitialized();
-    
-    res.json({
-      success: true,
-      data: {
-        status: 'healthy',
-        service: 'nft',
-        timestamp: new Date().toISOString(),
-        initialized: isInitialized,
-        contractAddress: isInitialized ? nftService.getContractAddress() : null
-      }
-    });
-  } catch (error) {
-    logger.error('NFT health check failed:', error);
-    res.status(500).json({
-      success: false,
-      error: 'NFT health check failed'
+      error: 'Failed to process mock repay',
     });
   }
 });

@@ -27,6 +27,7 @@ export interface AppConfig {
     vaultAddress: string;
     strategyManagerAddress: string;
     gaslessVaultAddress: string;
+    creditScoreAddress: string;
   };
   strategies: {
     [key: string]: StrategyConfig;
@@ -114,7 +115,8 @@ export const CONFIG: AppConfig = {
   contracts: {
     vaultAddress: process.env['VAULT_ADDRESS'] || '',
     strategyManagerAddress: process.env['STRATEGY_MANAGER_ADDRESS'] || '',
-    gaslessVaultAddress: process.env['GASLESS_VAULT_ADDRESS'] || ''
+    gaslessVaultAddress: process.env['GASLESS_VAULT_ADDRESS'] || '',
+    creditScoreAddress: process.env['CREDIT_SCORE_CONTRACT_ADDRESS'] || ''
   },
   
   strategies: {

@@ -1,0 +1,80 @@
+import React from 'react';
+import { createAppKit } from '@reown/appkit/react';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
+import { kaia, mainnet, arbitrum, polygon, base } from '@reown/appkit/networks';
+
+// Setup query client for React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 2,
+    },
+  },
+});
+
+// Get project ID from environment variables
+const projectId = import.meta.env.VITE_REOWN_PROJECT_ID || 'YOUR_PROJECT_ID';
+
+// App metadata
+const metadata = {
+  name: 'LINE Yield',
+  description: 'DeFi Yield Optimization & Lending Platform',
+  url: import.meta.env.VITE_APP_URL || 'https://line-yield.com',
+  icons: ['https://avatars.githubusercontent.com/u/179229932']
+};
+
+// Supported networks - focusing on Kaia and major EVM chains
+const networks = [
+  kaia, // Kaia network (main focus)
+  mainnet, // Ethereum mainnet
+  arbitrum, // Arbitrum
+  polygon, // Polygon
+  base, // Base
+];
+
+// Create Wagmi Adapter
+const wagmiAdapter = new WagmiAdapter({
+  networks,
+  projectId,
+  ssr: true,
+});
+
+// Create AppKit modal
+createAppKit({
+  adapters: [wagmiAdapter],
+  networks,
+  projectId,
+  metadata,
+  features: {
+    analytics: true, // Enable analytics
+    email: true, // Enable email authentication
+    socials: ['google', 'twitter', 'discord', 'github'], // Social login options
+    emailShowWallets: true, // Show wallet options in email flow
+  },
+  themeMode: 'light', // or 'dark' or 'auto'
+  themeVariables: {
+    '--w3m-accent': '#3b82f6', // Blue accent color
+    '--w3m-accent-foreground': '#ffffff',
+    '--w3m-border-radius-master': '8px',
+  },
+});
+
+interface AppKitProviderProps {
+  children: React.ReactNode;
+}
+
+export function AppKitProvider({ children }: AppKitProviderProps) {
+  return (
+    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
+
+// Export the wagmi config for use in other components
+export { wagmiAdapter };

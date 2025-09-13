@@ -85,8 +85,8 @@ export class CreditScoreService {
     this.provider = new ethers.providers.JsonRpcProvider(CONFIG.kaia.rpcUrl);
     this.wallet = new ethers.Wallet(CONFIG.kaia.walletPrivateKey, this.provider);
     
-    // Contract address would be set after deployment
-    const contractAddress = process.env.CREDIT_SCORE_CONTRACT_ADDRESS || '';
+    // Contract address from config
+    const contractAddress = CONFIG.contracts.creditScoreAddress;
     this.contract = new ethers.Contract(contractAddress, this.CONTRACT_ABI, this.wallet);
   }
 
@@ -479,4 +479,5 @@ export class CreditScoreService {
 
 // Export singleton instance
 export const creditScoreService = CreditScoreService.getInstance();
+
 

@@ -332,3 +332,4 @@ COMMENT ON FUNCTION update_qr_payment_daily_stats(DATE) IS 'Updates daily statis
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON qr_payment_webhooks TO line_yield_app;
 -- GRANT SELECT, INSERT ON qr_payment_webhook_logs TO line_yield_app;
 
+

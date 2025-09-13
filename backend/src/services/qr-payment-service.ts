@@ -282,3 +282,4 @@ export class QRPaymentService {
 // Singleton instance
 export const qrPaymentService = new QRPaymentService();
 
+

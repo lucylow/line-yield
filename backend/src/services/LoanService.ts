@@ -671,3 +671,4 @@ export class LoanService {
 // Export singleton instance
 export const loanService = LoanService.getInstance();
 
+

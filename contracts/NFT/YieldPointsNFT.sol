@@ -345,3 +345,4 @@ contract YieldPointsNFT is ERC721Enumerable, ERC721URIStorage, Ownable, Pausable
     }
 }
 
+

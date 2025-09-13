@@ -11,6 +11,7 @@ import { RateLimiterMemory } from 'rate-limiter-flexible';
 import rewardsRoutes from '../routes/rewards';
 import referralRoutes from '../routes/referral';
 import nftRoutes from '../routes/nft';
+import loanRoutes from '../routes/loans';
 import lineVerificationRoutes from '../routes/line-verification';
 import richMenuRoutes from '../routes/rich-menu';
 import secureRoutes from '../routes/secure';
@@ -115,6 +116,7 @@ export class ApiServer {
     this.app.use('/api/rewards', rewardsRoutes);
     this.app.use('/api/referral', referralRoutes);
     this.app.use('/api/nft', nftRoutes);
+    this.app.use('/api/loans', loanRoutes);
     this.app.use('/api/line', lineVerificationRoutes);
     this.app.use('/api/rich-menu', richMenuRoutes);
     this.app.use('/api/secure', secureRoutes);
@@ -128,15 +130,16 @@ export class ApiServer {
           name: 'LINE Yield API',
           version: '1.0.0',
           description: 'Comprehensive API for LINE Yield DeFi protocol',
-          endpoints: {
-            rewards: '/api/rewards',
-            referral: '/api/referral',
-            nft: '/api/nft',
-            line: '/api/line',
-            richMenu: '/api/rich-menu',
-            secure: '/api/secure',
-            qrPayment: '/api/qr-payment',
-          },
+        endpoints: {
+          rewards: '/api/rewards',
+          referral: '/api/referral',
+          nft: '/api/nft',
+          loans: '/api/loans',
+          line: '/api/line',
+          richMenu: '/api/rich-menu',
+          secure: '/api/secure',
+          qrPayment: '/api/qr-payment',
+        },
           documentation: 'https://docs.line-yield.com/api',
           support: 'https://support.line-yield.com',
         }

@@ -284,3 +284,4 @@ export const LoanTypes: React.FC<LoanTypesProps> = ({
   );
 };
 
+

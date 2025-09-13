@@ -409,3 +409,4 @@ export class NFTCollateralService {
 // Singleton instance
 export const nftCollateralService = new NFTCollateralService();
 
+

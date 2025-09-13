@@ -390,3 +390,4 @@ export const QRPaymentHistory: React.FC<QRPaymentHistoryProps> = ({ className })
   );
 };
 
+

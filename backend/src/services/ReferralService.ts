@@ -47,7 +47,7 @@ export class ReferralService {
     REFERRED_REWARDS: {
       signup: 100,        // Bonus points for new user
       deposit: 50,        // Bonus points for first deposit
-      apy_boost: 0.02    // 2% APY boost for first 30 days
+      yield_share: 0.02    // 2% APY boost for first 30 days
     },
     REFERRAL_CODE_LENGTH: 8,
     MAX_REFERRAL_DEPTH: 2 // Maximum referral depth (referrer -> referred -> referred's referred)
@@ -231,7 +231,7 @@ export class ReferralService {
         pendingRewards: pendingRewards.toString()
       };
     } catch (error) {
-      logger.error('Error getting referral data:', error);
+      Logger.error('Error getting referral data:', error);
       return null;
     }
   }
@@ -282,7 +282,7 @@ export class ReferralService {
         pendingRewards: pendingRewards.toString()
       };
     } catch (error) {
-      logger.error('Error getting referral stats:', error);
+      Logger.error('Error getting referral stats:', error);
       return null;
     }
   }
@@ -328,9 +328,9 @@ export class ReferralService {
         await this.awardNFTYieldPoints(referredAddress, referredPoints, `referral_${rewardType}`);
       }
 
-      logger.info(`Referral rewards awarded: ${rewardType} - Referrer: ${referrerPoints}, Referred: ${referredPoints}`);
+      Logger.info(`Referral rewards awarded: ${rewardType} - Referrer: ${referrerPoints}, Referred: ${referredPoints}`);
     } catch (error) {
-      logger.error('Error awarding referral rewards:', error);
+      Logger.error('Error awarding referral rewards:', error);
       throw error;
     }
   }
@@ -373,7 +373,7 @@ export class ReferralService {
         );
       }
     } catch (error) {
-      logger.error('Error tracking deposit for referral:', error);
+      Logger.error('Error tracking deposit for referral:', error);
     }
   }
 
@@ -408,7 +408,7 @@ export class ReferralService {
         );
       }
     } catch (error) {
-      logger.error('Error tracking yield for referral:', error);
+      Logger.error('Error tracking yield for referral:', error);
     }
   }
 
@@ -460,7 +460,7 @@ export class ReferralService {
 
       if (creditError) throw creditError;
     } catch (error) {
-      logger.error('Error creating referral reward:', error);
+      Logger.error('Error creating referral reward:', error);
       throw error;
     }
   }
@@ -495,7 +495,7 @@ export class ReferralService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Error getting referral leaderboard:', error);
+      Logger.error('Error getting referral leaderboard:', error);
       return [];
     }
   }
@@ -514,12 +514,12 @@ export class ReferralService {
       
       if (nftService.isServiceInitialized()) {
         await nftService.awardYieldPoints(userAddress, points, reason);
-        logger.info(`Awarded ${points} NFT yield points to ${userAddress} for ${reason}`);
+        Logger.info(`Awarded ${points} NFT yield points to ${userAddress} for ${reason}`);
       } else {
-        logger.warn('NFT service not initialized, skipping NFT yield points award');
+        Logger.warn('NFT service not initialized, skipping NFT yield points award');
       }
     } catch (error) {
-      logger.error('Error awarding NFT yield points:', error);
+      Logger.error('Error awarding NFT yield points:', error);
       // Don't throw error to avoid breaking referral flow
     }
   }

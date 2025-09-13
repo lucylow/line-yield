@@ -459,3 +459,4 @@ export class NFTService {
 // Export singleton instance
 export const nftService = NFTService.getInstance();
 
+
