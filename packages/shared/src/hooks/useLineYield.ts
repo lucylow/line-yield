@@ -23,6 +23,7 @@ export const useLineYield = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDepositing, setIsDepositing] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   // Mock data for demonstration
   const mockVaultData: VaultData = {
@@ -43,6 +44,7 @@ export const useLineYield = () => {
         setVaultData(mockVaultData);
       } catch (error) {
         console.error('Failed to load vault data:', error);
+        setError(error as Error);
       } finally {
         setIsLoading(false);
       }
@@ -104,6 +106,7 @@ export const useLineYield = () => {
     isWithdrawing,
     deposit,
     withdraw,
+    error,
     isLiff
   };
 };
