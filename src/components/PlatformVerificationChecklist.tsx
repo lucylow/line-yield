@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, AlertCircle, ExternalLink, Globe, Smartphone } from 'lucide-react';
 import { performSecurityAudit, validateSecurityCompliance } from '../utils/security-audit';
-import { usePlatform } from '../hooks/usePlatform';
+import { usePlatform } from '@shared/hooks/usePlatform';
 import { useLanguage } from '../i18n';
 
 interface ChecklistItem {
