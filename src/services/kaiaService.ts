@@ -2,10 +2,10 @@ import { ethers } from 'ethers';
 
 // Kaia blockchain configuration
 export const KAIA_CONFIG = {
-  chainId: 100,
+  chainId: 8217,
   chainName: 'Kaia Mainnet',
-  rpcUrl: import.meta.env.VITE_KAIA_RPC_URL || 'https://rpc.kaia.one',
-  blockExplorer: 'https://scope.kaia.one',
+  rpcUrl: import.meta.env.VITE_KAIA_RPC_URL || 'https://public-en.node.kaia.io',
+  blockExplorer: 'https://kaiascan.io',
   nativeCurrency: {
     name: 'Kaia',
     symbol: 'KAIA',
