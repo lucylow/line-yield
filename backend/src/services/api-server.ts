@@ -6,6 +6,7 @@ import cors from 'cors';
 import compression from 'compression';
 // import rateLimit from 'express-rate-limit'; // Commented out - package not installed
 import { RateLimiterMemory } from 'rate-limiter-flexible';
+import { localizationMiddleware } from '../middleware/localization-middleware';
 
 // Import route modules
 import rewardsRoutes from '../routes/rewards';
@@ -76,9 +77,18 @@ export class ApiServer {
     // Global rate limiting middleware
     this.app.use(this.rateLimitMiddleware.bind(this));
 
+    // Localization middleware
+    this.app.use(localizationMiddleware({
+      defaultLanguage: 'en',
+      detectionMethod: 'browser',
+      enableIPDetection: true,
+      enableBrowserDetection: true,
+      enableManualOverride: true,
+    }));
+
     // Request logging
     this.app.use((req, res, next) => {
-      Logger.info(`${req.method} ${req.path} - ${req.ip}`);
+      Logger.info(`${req.method} ${req.path} - ${req.ip} - Language: ${req.language || 'en'}`);
       next();
     });
   }
@@ -130,23 +140,25 @@ export class ApiServer {
 
     // API documentation endpoint
     this.app.get('/api', (req, res) => {
+      const t = req.t || ((key: string) => key);
       res.json({
         success: true,
         data: {
           name: 'LINE Yield API',
           version: '1.0.0',
-          description: 'Comprehensive API for LINE Yield DeFi protocol',
-        endpoints: {
-          rewards: '/api/rewards',
-          referral: '/api/referral',
-          nft: '/api/nft',
-          loans: '/api/loans',
-          line: '/api/line',
-          richMenu: '/api/rich-menu',
-          secure: '/api/secure',
-          qrPayment: '/api/qr-payment',
-          marketplace: '/api/marketplace',
-        },
+          description: t('api.welcome'),
+          language: req.language || 'en',
+          endpoints: {
+            rewards: '/api/rewards',
+            referral: '/api/referral',
+            nft: '/api/nft',
+            loans: '/api/loans',
+            line: '/api/line',
+            richMenu: '/api/rich-menu',
+            secure: '/api/secure',
+            qrPayment: '/api/qr-payment',
+            marketplace: '/api/marketplace',
+          },
           documentation: 'https://docs.line-yield.com/api',
           support: 'https://support.line-yield.com',
         }

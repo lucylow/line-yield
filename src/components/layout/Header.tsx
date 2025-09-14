@@ -10,6 +10,7 @@ import {
   TrendingUp, 
   Users, 
   Award, 
+  ShoppingBag,
   Settings, 
   User, 
   HelpCircle,
@@ -27,6 +28,7 @@ export const Header: React.FC = () => {
     { name: 'Loans', href: '/loans', icon: TrendingUp },
     { name: 'Referral', href: '/referral', icon: Users },
     { name: 'NFT Rewards', href: '/nft', icon: Award },
+    { name: 'Marketplace', href: '/marketplace', icon: ShoppingBag },
   ];
 
   const userMenuItems = [

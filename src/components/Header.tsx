@@ -53,7 +53,7 @@ export const Header = () => {
                   : 'text-gray-700 hover:text-green-600'
               }`}
             >
-              Home
+              {t('navigation.home')}
             </Link>
             <Link 
               to="/dashboard" 
@@ -63,7 +63,7 @@ export const Header = () => {
                   : 'text-gray-700 hover:text-green-600'
               }`}
             >
-              Dashboard
+              {t('navigation.dashboard')}
             </Link>
             <Link 
               to="/qr-payment" 
@@ -73,7 +73,7 @@ export const Header = () => {
                   : 'text-gray-700 hover:text-green-600'
               }`}
             >
-              QR Payments
+              {t('qrPayment.title')}
             </Link>
             <a 
               href="#features" 
@@ -99,6 +99,9 @@ export const Header = () => {
           <MobileNavigation />
           
           <div className="flex gap-4 items-center">
+            {/* Language Switcher */}
+            <LanguageSwitcher variant="compact" />
+            
             {/* Settings Button */}
             <Button
               variant="ghost"
@@ -151,7 +154,7 @@ export const Header = () => {
                   onClick={() => signOut()}
                   className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
                 >
-                  Sign Out
+                  {t('common.signOut')}
                 </Button>
               </div>
             ) : (
@@ -162,14 +165,14 @@ export const Header = () => {
                   className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-300"
                 >
                   <User className="w-4 h-4 mr-2" />
-                  Sign In
+                  {t('common.signIn')}
                 </Button>
                 <Button 
                   onClick={() => connectWallet()} 
                   className="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <Wallet className="w-4 h-4 mr-2" />
-                  Connect Wallet
+                  {t('wallet.connect')}
                 </Button>
               </div>
             )}

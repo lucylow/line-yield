@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Logger } from '../utils/logger';
 
 // Supported languages
 export type SupportedLanguage = 'en' | 'ja';
@@ -43,19 +43,19 @@ export interface TranslationKeys {
     detectionMethod: string;
   };
   
-  // Navigation
-  navigation: {
-    home: string;
-    dashboard: string;
-    portfolio: string;
-    marketplace: string;
-    nftCollateral: string;
-    referral: string;
-    rewards: string;
-    settings: string;
-    profile: string;
-    help: string;
-    about: string;
+  // API Messages
+  api: {
+    welcome: string;
+    healthCheck: string;
+    serviceRunning: string;
+    endpointNotFound: string;
+    methodNotAllowed: string;
+    validationError: string;
+    authenticationRequired: string;
+    insufficientPermissions: string;
+    rateLimitExceeded: string;
+    serverError: string;
+    maintenanceMode: string;
   };
   
   // Wallet
@@ -71,6 +71,11 @@ export interface TranslationKeys {
     addToken: string;
     copyAddress: string;
     viewOnExplorer: string;
+    transactionSubmitted: string;
+    transactionConfirmed: string;
+    transactionFailed: string;
+    insufficientBalance: string;
+    networkError: string;
   };
   
   // NFT Collateral
@@ -96,6 +101,10 @@ export interface TranslationKeys {
     interestAccrued: string;
     timeToLiquidation: string;
     liquidationPrice: string;
+    positionCreated: string;
+    positionUpdated: string;
+    positionClosed: string;
+    liquidationTriggered: string;
   };
   
   // Marketplace
@@ -125,38 +134,13 @@ export interface TranslationKeys {
     currentBid: string;
     bidHistory: string;
     similarItems: string;
-  };
-  
-  // Mini Dapp Store
-  miniDappStore: {
-    title: string;
-    description: string;
-    featured: string;
-    categories: string;
-    newItems: string;
-    popular: string;
-    onSale: string;
-    inAppItems: string;
-    nfts: string;
-    digitalAssets: string;
-    virtualGoods: string;
-    gameItems: string;
-    collectibles: string;
-    utilities: string;
-    buyWithLinePay: string;
-    buyWithCrypto: string;
-    priceInFiat: string;
-    priceInCrypto: string;
-    addToCart: string;
-    viewCart: string;
-    checkout: string;
-    paymentMethod: string;
-    totalAmount: string;
-    processingFee: string;
-    confirmPurchase: string;
-    purchaseComplete: string;
-    downloadItem: string;
-    itemDelivered: string;
+    listingCreated: string;
+    listingUpdated: string;
+    listingCancelled: string;
+    purchaseCompleted: string;
+    offerSubmitted: string;
+    offerAccepted: string;
+    offerRejected: string;
   };
   
   // QR Payment
@@ -181,6 +165,10 @@ export interface TranslationKeys {
     processingTime: string;
     refundPolicy: string;
     contactSupport: string;
+    sessionCreated: string;
+    sessionExpired: string;
+    sessionCancelled: string;
+    paymentProcessed: string;
   };
   
   // Errors
@@ -198,6 +186,12 @@ export interface TranslationKeys {
     unknownError: string;
     tryAgain: string;
     contactSupport: string;
+    validationFailed: string;
+    authenticationFailed: string;
+    authorizationFailed: string;
+    resourceNotFound: string;
+    conflictError: string;
+    timeoutError: string;
   };
   
   // Success messages
@@ -213,20 +207,10 @@ export interface TranslationKeys {
     paymentReceived: string;
     settingsSaved: string;
     profileUpdated: string;
+    dataRetrieved: string;
+    operationCompleted: string;
   };
 }
-
-// Language context
-interface LanguageContextType {
-  language: SupportedLanguage;
-  setLanguage: (lang: SupportedLanguage) => void;
-  detectionMethod: LanguageDetectionMethod;
-  setDetectionMethod: (method: LanguageDetectionMethod) => void;
-  t: (key: string) => string;
-  isLoading: boolean;
-}
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 // Translation data
 const translations: Record<SupportedLanguage, TranslationKeys> = {
@@ -264,18 +248,18 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       manualSelection: 'Manual selection',
       detectionMethod: 'Detection Method',
     },
-    navigation: {
-      home: 'Home',
-      dashboard: 'Dashboard',
-      portfolio: 'Portfolio',
-      marketplace: 'Marketplace',
-      nftCollateral: 'NFT Collateral',
-      referral: 'Referral',
-      rewards: 'Rewards',
-      settings: 'Settings',
-      profile: 'Profile',
-      help: 'Help',
-      about: 'About',
+    api: {
+      welcome: 'Welcome to LINE Yield API',
+      healthCheck: 'Health check endpoint',
+      serviceRunning: 'Service is running',
+      endpointNotFound: 'API endpoint not found',
+      methodNotAllowed: 'Method not allowed',
+      validationError: 'Validation error',
+      authenticationRequired: 'Authentication required',
+      insufficientPermissions: 'Insufficient permissions',
+      rateLimitExceeded: 'Rate limit exceeded',
+      serverError: 'Internal server error',
+      maintenanceMode: 'Service is under maintenance',
     },
     wallet: {
       connect: 'Connect Wallet',
@@ -289,6 +273,11 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       addToken: 'Add Token',
       copyAddress: 'Copy Address',
       viewOnExplorer: 'View on Explorer',
+      transactionSubmitted: 'Transaction submitted successfully',
+      transactionConfirmed: 'Transaction confirmed',
+      transactionFailed: 'Transaction failed',
+      insufficientBalance: 'Insufficient balance',
+      networkError: 'Network error',
     },
     nftCollateral: {
       title: 'NFT Collateral',
@@ -312,6 +301,10 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       interestAccrued: 'Interest Accrued',
       timeToLiquidation: 'Time to Liquidation',
       liquidationPrice: 'Liquidation Price',
+      positionCreated: 'Collateral position created successfully',
+      positionUpdated: 'Collateral position updated successfully',
+      positionClosed: 'Collateral position closed successfully',
+      liquidationTriggered: 'Liquidation triggered',
     },
     marketplace: {
       title: 'NFT Marketplace',
@@ -339,36 +332,13 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       currentBid: 'Current Bid',
       bidHistory: 'Bid History',
       similarItems: 'Similar Items',
-    },
-    miniDappStore: {
-      title: 'Mini Dapp Store',
-      description: 'Buy NFTs and in-app items with LINE Pay integration.',
-      featured: 'Featured',
-      categories: 'Categories',
-      newItems: 'New Items',
-      popular: 'Popular',
-      onSale: 'On Sale',
-      inAppItems: 'In-App Items',
-      nfts: 'NFTs',
-      digitalAssets: 'Digital Assets',
-      virtualGoods: 'Virtual Goods',
-      gameItems: 'Game Items',
-      collectibles: 'Collectibles',
-      utilities: 'Utilities',
-      buyWithLinePay: 'Buy with LINE Pay',
-      buyWithCrypto: 'Buy with Crypto',
-      priceInFiat: 'Price (Fiat)',
-      priceInCrypto: 'Price (Crypto)',
-      addToCart: 'Add to Cart',
-      viewCart: 'View Cart',
-      checkout: 'Checkout',
-      paymentMethod: 'Payment Method',
-      totalAmount: 'Total Amount',
-      processingFee: 'Processing Fee',
-      confirmPurchase: 'Confirm Purchase',
-      purchaseComplete: 'Purchase Complete',
-      downloadItem: 'Download Item',
-      itemDelivered: 'Item Delivered',
+      listingCreated: 'NFT listing created successfully',
+      listingUpdated: 'NFT listing updated successfully',
+      listingCancelled: 'NFT listing cancelled successfully',
+      purchaseCompleted: 'Purchase completed successfully',
+      offerSubmitted: 'Offer submitted successfully',
+      offerAccepted: 'Offer accepted successfully',
+      offerRejected: 'Offer rejected successfully',
     },
     qrPayment: {
       title: 'QR Code Payment',
@@ -391,6 +361,10 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       processingTime: 'Processing Time',
       refundPolicy: 'Refund Policy',
       contactSupport: 'Contact Support',
+      sessionCreated: 'Payment session created successfully',
+      sessionExpired: 'Payment session expired',
+      sessionCancelled: 'Payment session cancelled',
+      paymentProcessed: 'Payment processed successfully',
     },
     errors: {
       networkError: 'Network error. Please check your connection.',
@@ -406,6 +380,12 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       unknownError: 'An unknown error occurred.',
       tryAgain: 'Try Again',
       contactSupport: 'Contact Support',
+      validationFailed: 'Validation failed',
+      authenticationFailed: 'Authentication failed',
+      authorizationFailed: 'Authorization failed',
+      resourceNotFound: 'Resource not found',
+      conflictError: 'Conflict error',
+      timeoutError: 'Request timeout',
     },
     success: {
       walletConnected: 'Wallet connected successfully!',
@@ -419,6 +399,8 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       paymentReceived: 'Payment received successfully!',
       settingsSaved: 'Settings saved successfully!',
       profileUpdated: 'Profile updated successfully!',
+      dataRetrieved: 'Data retrieved successfully!',
+      operationCompleted: 'Operation completed successfully!',
     },
   },
   ja: {
@@ -455,18 +437,18 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       manualSelection: '手動選択',
       detectionMethod: '検出方法',
     },
-    navigation: {
-      home: 'ホーム',
-      dashboard: 'ダッシュボード',
-      portfolio: 'ポートフォリオ',
-      marketplace: 'マーケットプレイス',
-      nftCollateral: 'NFT担保',
-      referral: '紹介',
-      rewards: '報酬',
-      settings: '設定',
-      profile: 'プロフィール',
-      help: 'ヘルプ',
-      about: 'について',
+    api: {
+      welcome: 'LINE Yield APIへようこそ',
+      healthCheck: 'ヘルスチェックエンドポイント',
+      serviceRunning: 'サービスが稼働中です',
+      endpointNotFound: 'APIエンドポイントが見つかりません',
+      methodNotAllowed: 'メソッドが許可されていません',
+      validationError: 'バリデーションエラー',
+      authenticationRequired: '認証が必要です',
+      insufficientPermissions: '権限が不足しています',
+      rateLimitExceeded: 'レート制限を超過しました',
+      serverError: '内部サーバーエラー',
+      maintenanceMode: 'サービスはメンテナンス中です',
     },
     wallet: {
       connect: 'ウォレット接続',
@@ -480,6 +462,11 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       addToken: 'トークン追加',
       copyAddress: 'アドレスコピー',
       viewOnExplorer: 'エクスプローラーで表示',
+      transactionSubmitted: 'トランザクションが正常に送信されました',
+      transactionConfirmed: 'トランザクションが確認されました',
+      transactionFailed: 'トランザクションが失敗しました',
+      insufficientBalance: '残高不足',
+      networkError: 'ネットワークエラー',
     },
     nftCollateral: {
       title: 'NFT担保',
@@ -503,6 +490,10 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       interestAccrued: '発生利息',
       timeToLiquidation: '清算までの時間',
       liquidationPrice: '清算価格',
+      positionCreated: '担保ポジションが正常に作成されました',
+      positionUpdated: '担保ポジションが正常に更新されました',
+      positionClosed: '担保ポジションが正常に閉じられました',
+      liquidationTriggered: '清算が実行されました',
     },
     marketplace: {
       title: 'NFTマーケットプレイス',
@@ -530,36 +521,13 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       currentBid: '現在の入札',
       bidHistory: '入札履歴',
       similarItems: '類似アイテム',
-    },
-    miniDappStore: {
-      title: 'ミニDappストア',
-      description: 'LINE Pay統合でNFTとアプリ内アイテムを購入できます。',
-      featured: 'おすすめ',
-      categories: 'カテゴリー',
-      newItems: '新着アイテム',
-      popular: '人気',
-      onSale: 'セール中',
-      inAppItems: 'アプリ内アイテム',
-      nfts: 'NFT',
-      digitalAssets: 'デジタルアセット',
-      virtualGoods: 'バーチャルグッズ',
-      gameItems: 'ゲームアイテム',
-      collectibles: 'コレクタブル',
-      utilities: 'ユーティリティ',
-      buyWithLinePay: 'LINE Payで購入',
-      buyWithCrypto: '暗号通貨で購入',
-      priceInFiat: '価格（法定通貨）',
-      priceInCrypto: '価格（暗号通貨）',
-      addToCart: 'カートに追加',
-      viewCart: 'カートを見る',
-      checkout: 'チェックアウト',
-      paymentMethod: '支払い方法',
-      totalAmount: '合計金額',
-      processingFee: '処理手数料',
-      confirmPurchase: '購入確認',
-      purchaseComplete: '購入完了',
-      downloadItem: 'アイテムダウンロード',
-      itemDelivered: 'アイテム配信済み',
+      listingCreated: 'NFT出品が正常に作成されました',
+      listingUpdated: 'NFT出品が正常に更新されました',
+      listingCancelled: 'NFT出品が正常にキャンセルされました',
+      purchaseCompleted: '購入が正常に完了しました',
+      offerSubmitted: 'オファーが正常に送信されました',
+      offerAccepted: 'オファーが正常に承認されました',
+      offerRejected: 'オファーが正常に拒否されました',
     },
     qrPayment: {
       title: 'QRコード決済',
@@ -582,6 +550,10 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       processingTime: '処理時間',
       refundPolicy: '返金ポリシー',
       contactSupport: 'サポートに連絡',
+      sessionCreated: '決済セッションが正常に作成されました',
+      sessionExpired: '決済セッションが期限切れです',
+      sessionCancelled: '決済セッションがキャンセルされました',
+      paymentProcessed: '決済が正常に処理されました',
     },
     errors: {
       networkError: 'ネットワークエラー。接続を確認してください。',
@@ -597,11 +569,17 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       unknownError: '不明なエラーが発生しました。',
       tryAgain: '再試行',
       contactSupport: 'サポートに連絡',
+      validationFailed: 'バリデーションに失敗しました',
+      authenticationFailed: '認証に失敗しました',
+      authorizationFailed: '認可に失敗しました',
+      resourceNotFound: 'リソースが見つかりません',
+      conflictError: '競合エラー',
+      timeoutError: 'リクエストタイムアウト',
     },
     success: {
       walletConnected: 'ウォレットが正常に接続されました！',
-      transactionSubmitted: '取引が正常に送信されました！',
-      transactionConfirmed: '取引が確認されました！',
+      transactionSubmitted: 'トランザクションが正常に送信されました！',
+      transactionConfirmed: 'トランザクションが確認されました！',
       nftDeposited: 'NFTが正常に入金されました！',
       loanCreated: 'ローンが正常に作成されました！',
       loanRepaid: 'ローンが正常に返済されました！',
@@ -610,16 +588,20 @@ const translations: Record<SupportedLanguage, TranslationKeys> = {
       paymentReceived: '決済が正常に受領されました！',
       settingsSaved: '設定が正常に保存されました！',
       profileUpdated: 'プロフィールが正常に更新されました！',
+      dataRetrieved: 'データが正常に取得されました！',
+      operationCompleted: '操作が正常に完了しました！',
     },
   },
 };
 
 // Language detection utilities
-export const detectLanguageFromBrowser = (): SupportedLanguage => {
-  const browserLang = navigator.language || (navigator as any).userLanguage;
+export const detectLanguageFromBrowser = (acceptLanguage?: string): SupportedLanguage => {
+  if (!acceptLanguage) {
+    return 'en';
+  }
   
   // Check for Japanese
-  if (browserLang.startsWith('ja')) {
+  if (acceptLanguage.includes('ja')) {
     return 'ja';
   }
   
@@ -627,10 +609,14 @@ export const detectLanguageFromBrowser = (): SupportedLanguage => {
   return 'en';
 };
 
-export const detectLanguageFromIP = async (): Promise<SupportedLanguage> => {
+export const detectLanguageFromIP = async (ip?: string): Promise<SupportedLanguage> => {
   try {
+    if (!ip) {
+      return 'en';
+    }
+    
     // Use a free IP geolocation service
-    const response = await fetch('https://ipapi.co/json/');
+    const response = await fetch(`https://ipapi.co/${ip}/json/`);
     const data = await response.json();
     
     // Check if country is Japan
@@ -640,117 +626,70 @@ export const detectLanguageFromIP = async (): Promise<SupportedLanguage> => {
     
     return 'en';
   } catch (error) {
-    console.warn('Failed to detect language from IP:', error);
+    Logger.warn('Failed to detect language from IP:', error);
     return 'en'; // Fallback to English
   }
 };
 
-// Language provider component
-interface LanguageProviderProps {
-  children: ReactNode;
-}
+// Localization service class
+export class LocalizationService {
+  private static instance: LocalizationService;
+  private currentLanguage: SupportedLanguage = 'en';
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<SupportedLanguage>('en');
-  const [detectionMethod, setDetectionMethod] = useState<LanguageDetectionMethod>('browser');
-  const [isLoading, setIsLoading] = useState(true);
+  private constructor() {}
 
-  // Initialize language detection
-  useEffect(() => {
-    const initializeLanguage = async () => {
-      try {
-        // Check for saved language preference
-        const savedLanguage = localStorage.getItem('line-yield-language') as SupportedLanguage;
-        const savedMethod = localStorage.getItem('line-yield-language-method') as LanguageDetectionMethod;
-        
-        if (savedLanguage && savedMethod) {
-          setLanguage(savedLanguage);
-          setDetectionMethod(savedMethod);
-          setIsLoading(false);
-          return;
-        }
-        
-        // Auto-detect language
-        let detectedLanguage: SupportedLanguage;
-        
-        if (savedMethod === 'ip') {
-          detectedLanguage = await detectLanguageFromIP();
-        } else {
-          detectedLanguage = detectLanguageFromBrowser();
-        }
-        
-        setLanguage(detectedLanguage);
-        setDetectionMethod(savedMethod || 'browser');
-        
-        // Save preferences
-        localStorage.setItem('line-yield-language', detectedLanguage);
-        localStorage.setItem('line-yield-language-method', savedMethod || 'browser');
-        
-      } catch (error) {
-        console.warn('Language detection failed:', error);
-        setLanguage('en');
-        setDetectionMethod('browser');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  public static getInstance(): LocalizationService {
+    if (!LocalizationService.instance) {
+      LocalizationService.instance = new LocalizationService();
+    }
+    return LocalizationService.instance;
+  }
 
-    initializeLanguage();
-  }, []);
+  public setLanguage(language: SupportedLanguage): void {
+    this.currentLanguage = language;
+  }
 
-  // Translation function
-  const t = (key: string): string => {
+  public getLanguage(): SupportedLanguage {
+    return this.currentLanguage;
+  }
+
+  public translate(key: string): string {
     const keys = key.split('.');
-    let value: any = translations[language];
+    let value: any = translations[this.currentLanguage];
     
     for (const k of keys) {
       value = value?.[k];
     }
     
     return value || key; // Return key if translation not found
-  };
-
-  // Update language and save to localStorage
-  const handleSetLanguage = (lang: SupportedLanguage) => {
-    setLanguage(lang);
-    localStorage.setItem('line-yield-language', lang);
-  };
-
-  // Update detection method and save to localStorage
-  const handleSetDetectionMethod = (method: LanguageDetectionMethod) => {
-    setDetectionMethod(method);
-    localStorage.setItem('line-yield-language-method', method);
-  };
-
-  const value: LanguageContextType = {
-    language,
-    setLanguage: handleSetLanguage,
-    detectionMethod,
-    setDetectionMethod: handleSetDetectionMethod,
-    t,
-    isLoading,
-  };
-
-  return React.createElement(
-    LanguageContext.Provider,
-    { value },
-    children
-  );
-};
-
-// Hook to use language context
-export const useLanguage = (): LanguageContextType => {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
   }
-  return context;
-};
 
-// Hook for translations
-export const useTranslation = () => {
-  const { t } = useLanguage();
-  return { t };
-};
+  public async detectLanguage(
+    acceptLanguage?: string,
+    ip?: string,
+    method: LanguageDetectionMethod = 'browser'
+  ): Promise<SupportedLanguage> {
+    try {
+      switch (method) {
+        case 'ip':
+          return await detectLanguageFromIP(ip);
+        case 'browser':
+        default:
+          return detectLanguageFromBrowser(acceptLanguage);
+      }
+    } catch (error) {
+      Logger.warn('Language detection failed:', error);
+      return 'en'; // Fallback to English
+    }
+  }
 
-export default translations;
+  public getTranslations(): TranslationKeys {
+    return translations[this.currentLanguage];
+  }
+
+  public getSupportedLanguages(): SupportedLanguage[] {
+    return ['en', 'ja'];
+  }
+}
+
+export default LocalizationService;
