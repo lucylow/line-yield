@@ -17,11 +17,49 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@shared/*": ["packages/shared/src/*"]
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "packages",
+    "backend",
+    "contracts",
+    "src/pages/api",
+    "src/components/ui",
+    "src/hooks/useKaiaWallet.ts",
+    "src/hooks/useLiff.tsx",
+    "src/hooks/useLineInvite.ts",
+    "src/hooks/useQRPayment.ts",
+    "src/hooks/useReferral.ts",
+    "src/hooks/useSecureApi.ts",
+    "src/hooks/useSupabaseAuth.ts",
+    "src/hooks/useSupabaseVault.ts",
+    "src/hooks/useVault.ts",
+    "src/hooks/useYieldToken.ts",
+    "src/pages/Index.tsx",
+    "src/pages/KaiaLineMiniDapp.tsx",
+    "src/pages/LineMiniDapp.tsx",
+    "src/pages/MobileDashboard.tsx",
+    "src/pages/MobileGamification.tsx",
+    "src/pages/MobileLanding.tsx",
+    "src/pages/MultilingualDemoPage.tsx",
+    "src/pages/TradePage.tsx",
+    "src/pages/WebMiniDapp.tsx",
+    "src/providers/AppKitProvider.tsx",
+    "src/services/AnalyticsService.ts",
+    "src/services/GamificationService.ts",
+    "src/services/MiniDappSDK.ts",
+    "src/services/PaymentService.ts",
+    "src/services/SecureApiClient.ts",
+    "src/services/supabase.ts",
+    "src/utils/routes.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
