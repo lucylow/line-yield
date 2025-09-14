@@ -21,15 +21,7 @@
     }
   },
   "include": [
-    "src/main.tsx",
-    "src/App.tsx",
-    "src/providers/SimpleWalletProvider.tsx",
-    "src/components/ErrorBoundary.tsx",
-    "src/components/WalletConnectButton.tsx",
-    "src/components/NetworkBanner.tsx",
-    "src/components/simple/*",
-    "src/utils/cn.ts",
-    "src/hooks/useWallet.ts"
+    "src/**/*"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

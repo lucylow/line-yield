@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useWallet } from '../hooks/useWallet';
-import { LoanTypes } from '../packages/shared/src/components/LoanTypes';
-import { LoanCreator } from '../packages/shared/src/components/LoanCreator';
-import { LoanManager } from '../packages/shared/src/components/LoanManager';
+import { LoanTypes } from '@/packages/shared/components/LoanTypes';
+import { LoanCreator } from '@/packages/shared/components/LoanCreator';
+import { LoanManager } from '@/packages/shared/components/LoanManager';
 import { cn } from '../utils/cn';
 
 interface LoanType {

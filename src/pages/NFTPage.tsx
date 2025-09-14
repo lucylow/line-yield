@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NFTCollection } from '../packages/shared/src/components/NFTCollection';
-import { NFTMinter } from '../packages/shared/src/components/NFTMinter';
+import { NFTCollection } from '@/packages/shared/components/NFTCollection';
+import { NFTMinter } from '@/packages/shared/components/NFTMinter';
 import { cn } from '../utils/cn';
 
 interface NFTTier {

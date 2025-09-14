@@ -28,6 +28,14 @@ export interface AppConfig {
     strategyManagerAddress: string;
     gaslessVaultAddress: string;
     creditScoreAddress: string;
+    nftCollateralVaultAddress: string;
+    nftPriceOracleAddress: string;
+    liquidationEngineAddress: string;
+    yieldPointsNFTAddress: string;
+    stablecoinSwapAddress: string;
+    daoGovernanceAddress: string;
+    secureVaultAddress: string;
+    securityOracleAddress: string;
   };
   strategies: {
     [key: string]: StrategyConfig;
@@ -116,7 +124,15 @@ export const CONFIG: AppConfig = {
     vaultAddress: process.env['VAULT_ADDRESS'] || '',
     strategyManagerAddress: process.env['STRATEGY_MANAGER_ADDRESS'] || '',
     gaslessVaultAddress: process.env['GASLESS_VAULT_ADDRESS'] || '',
-    creditScoreAddress: process.env['CREDIT_SCORE_CONTRACT_ADDRESS'] || ''
+    creditScoreAddress: process.env['CREDIT_SCORE_CONTRACT_ADDRESS'] || '',
+    nftCollateralVaultAddress: process.env['NFT_COLLATERAL_VAULT_ADDRESS'] || '',
+    nftPriceOracleAddress: process.env['NFT_PRICE_ORACLE_ADDRESS'] || '',
+    liquidationEngineAddress: process.env['LIQUIDATION_ENGINE_ADDRESS'] || '',
+    yieldPointsNFTAddress: process.env['YIELD_POINTS_NFT_ADDRESS'] || '',
+    stablecoinSwapAddress: process.env['STABLECOIN_SWAP_ADDRESS'] || '',
+    daoGovernanceAddress: process.env['DAO_GOVERNANCE_ADDRESS'] || '',
+    secureVaultAddress: process.env['SECURE_VAULT_ADDRESS'] || '',
+    securityOracleAddress: process.env['SECURITY_ORACLE_ADDRESS'] || ''
   },
   
   strategies: {
