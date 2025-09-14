@@ -24,7 +24,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/" element={<Layout />}>
+            <Route element={<Layout />}>
               <Route path="/dashboard" element={<Index />} />
               <Route path="/loans" element={<LoanPage />} />
               <Route path="/referral" element={<ReferralPage />} />

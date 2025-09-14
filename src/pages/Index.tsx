@@ -9,7 +9,6 @@ import { TransactionHistory } from '../components/TransactionHistory';
 import { NotificationsPanel } from '../components/NotificationsPanel';
 import { LoadingCard, LoadingSpinner } from '../components/LoadingSpinner';
 import { AuthModal } from '../components/AuthModal';
-import { KaiaApiTest } from '../components/KaiaApiTest';
 import { Button } from '@/components/ui/button';
 import { VAULT_ADDRESS } from '../utils/constants';
 import { ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, DollarSign, Percent, RefreshCw } from 'lucide-react';
@@ -69,10 +68,6 @@ const Dashboard = () => {
       </div>
       
       <div className="container mx-auto px-4 py-8 relative z-10">
-        {/* KAIA API Test Section */}
-        <div className="mb-8 flex justify-center animate-fade-in">
-          <KaiaApiTest />
-        </div>
         
         {/* Dashboard Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8 animate-fade-in">
