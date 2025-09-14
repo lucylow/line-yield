@@ -43,7 +43,7 @@ export class WalletService {
       } catch (switchError: any) {
         // If network doesn't exist, add it
         if (switchError.code === 4902) {
-          await this.addKaiaNetwork();
+          await this.addKaiaNetwork(chainId);
         } else {
           throw switchError;
         }
@@ -67,22 +67,34 @@ export class WalletService {
     return '0x742d35Cc6634C0532925a3b8D8C8d6C7B8b8b8b8';
   }
 
-  private async addKaiaNetwork(): Promise<void> {
+  private async addKaiaNetwork(chainId?: number): Promise<void> {
+    const isMainnet = chainId === 8217;
+    
+    const networkConfig = isMainnet ? {
+      chainId: '0x2011', // 8217 in hex
+      chainName: 'Kaia Mainnet',
+      nativeCurrency: {
+        name: 'KAIA',
+        symbol: 'KAIA',
+        decimals: 18,
+      },
+      rpcUrls: ['https://rpc.kaia.one'],
+      blockExplorerUrls: ['https://kaiascan.io'],
+    } : {
+      chainId: '0x3e9', // 1001 in hex
+      chainName: 'Kaia Testnet',
+      nativeCurrency: {
+        name: 'KAIA',
+        symbol: 'KAIA',
+        decimals: 18,
+      },
+      rpcUrls: ['https://api.baobab.kaia.io'],
+      blockExplorerUrls: ['https://baobab.kaiascan.io'],
+    };
+
     await window.ethereum.request({
       method: 'wallet_addEthereumChain',
-      params: [
-        {
-          chainId: '0x3e9', // 1001 in hex
-          chainName: 'Kaia Testnet',
-          nativeCurrency: {
-            name: 'KAIA',
-            symbol: 'KAIA',
-            decimals: 18,
-          },
-          rpcUrls: ['https://api.testnet.kaia.io'],
-          blockExplorerUrls: ['https://testnet.kaia.io'],
-        },
-      ],
+      params: [networkConfig],
     });
   }
 
