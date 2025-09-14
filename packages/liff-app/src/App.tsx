@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { LineNextProvider } from '@line-yield/shared/providers/LineNextProvider';
 import { SimpleWalletProvider } from '@line-yield/shared/providers/SimpleWalletProvider';
 import { ErrorBoundary } from '@line-yield/shared/components/ErrorBoundary';
+import { LanguageProvider } from '@line-yield/shared/i18n';
 import Landing from '@line-yield/shared/pages/Landing';
 import { initializeLIFF, isLIFFAvailable } from './config/liff';
 
@@ -65,11 +66,13 @@ const LIFFApp: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <LineNextProvider>
-        <SimpleWalletProvider>
-          <Landing />
-        </SimpleWalletProvider>
-      </LineNextProvider>
+      <LanguageProvider>
+        <LineNextProvider>
+          <SimpleWalletProvider>
+            <Landing />
+          </SimpleWalletProvider>
+        </LineNextProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 };
