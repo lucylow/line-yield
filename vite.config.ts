@@ -1,38 +1,24 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { componentTagger } from "lovable-tagger"
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
+  plugins: [
+    react(),
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@/components': path.resolve(__dirname, './src/components'),
-      '@/hooks': path.resolve(__dirname, './src/hooks'),
-      '@/providers': path.resolve(__dirname, './src/providers'),
-      '@/pages': path.resolve(__dirname, './src/pages'),
-      '@/utils': path.resolve(__dirname, './src/utils'),
-      '@shared': path.resolve(__dirname, './packages/shared/src'),
-      '@/packages/shared': path.resolve(__dirname, './packages/shared/src'),
+      "@": path.resolve(__dirname, "./src"),
     },
-  },
-  server: {
-    port: 8080,
-    host: true,
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
   },
   define: {
     global: 'globalThis',
   },
-  // Exclude packages from the main build
-  publicDir: 'public',
-  root: '.',
-  // Exclude packages directory from scanning
-  optimizeDeps: {
-    exclude: ['@line-yield/shared', '@line-yield/liff-app', '@line-yield/web-app']
-  }
-})
+}))
