@@ -1,6 +1,7 @@
 export { Layout } from './Layout';
 export { Button } from './Button';
 export { LoadingSpinner } from './LoadingSpinner';
+export { ConnectWalletModal } from './ConnectWalletModal';
 export { PurchasePrecautions } from './PurchasePrecautions';
 export { ConnectedWalletDisplay } from './ConnectedWalletDisplay';
 export { PaymentNotification, PaymentToast } from './PaymentNotification';

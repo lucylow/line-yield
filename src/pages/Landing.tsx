@@ -4,6 +4,7 @@ import { Button } from '../components/simple/Button';
 import { useWallet } from '../hooks/useWallet';
 import Chatbot from '../components/Chatbot';
 import { LineNextIntegration } from '../components/LineNextIntegration';
+import { ConnectWallet } from '@shared/components';
 
 const Landing = () => {
   const { isConnected, connect } = useWallet();
@@ -64,14 +65,7 @@ const Landing = () => {
                 <i className="fas fa-sign-in-alt mr-2"></i>
                 Sign In
               </Button>
-              <Button 
-                onClick={handleConnectWallet}
-                size="sm"
-                className="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <i className="fas fa-wallet mr-2"></i>
-                Connect Wallet
-              </Button>
+              <ConnectWallet className="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300" />
             </div>
 
             {/* Mobile Menu Button */}
@@ -136,17 +130,7 @@ const Landing = () => {
                     <i className="fas fa-sign-in-alt mr-2"></i>
                     Sign In
                   </Button>
-                  <Button 
-                    onClick={() => {
-                      handleConnectWallet();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    size="sm"
-                    className="w-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    <i className="fas fa-wallet mr-2"></i>
-                    Connect Wallet
-                  </Button>
+                  <ConnectWallet className="w-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300" />
                 </div>
               </nav>
             </div>
