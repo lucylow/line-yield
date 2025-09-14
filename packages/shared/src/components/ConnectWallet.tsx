@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { useUniversalWallet } from '../hooks/useUniversalWallet'
 import { usePlatform } from '../hooks/usePlatform'
 import { ConnectWalletModal } from './ConnectWalletModal'
+import { Button } from './Button'
+import { cn } from '../utils/cn'
 
 interface ConnectWalletProps {
   className?: string
@@ -50,16 +52,18 @@ export const ConnectWallet: React.FC<ConnectWalletProps> = ({ className = '' }) 
             </button>
           </div>
         ) : (
-          <button 
+          <Button 
             onClick={handleButtonClick}
-            className={`connect-btn px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={cn(
+              'connect-btn',
               isLiff 
                 ? 'bg-green-600 text-white hover:bg-green-700' 
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
+                : 'bg-blue-600 text-white hover:bg-blue-700',
+              className
+            )}
           >
             {isLiff ? 'Connect LINE Wallet' : 'Connect Wallet'}
-          </button>
+          </Button>
         )}
       </div>
       
