@@ -12,7 +12,9 @@
     "build:all": "pnpm --filter @line-yield/shared build && pnpm --filter @line-yield/liff-app build && pnpm --filter @line-yield/web-app build",
     "build:liff": "pnpm --filter @line-yield/liff-app build",
     "build:web": "pnpm --filter @line-yield/web-app build",
-    "preview": "vite preview"
+    "build:shared": "pnpm --filter @line-yield/shared build",
+    "preview": "vite preview",
+    "install:all": "pnpm install && pnpm --filter @line-yield/shared install && pnpm --filter @line-yield/liff-app install && pnpm --filter @line-yield/web-app install"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

@@ -28,4 +28,11 @@ export default defineConfig({
   define: {
     global: 'globalThis',
   },
+  // Exclude packages from the main build
+  publicDir: 'public',
+  root: '.',
+  // Exclude packages directory from scanning
+  optimizeDeps: {
+    exclude: ['@line-yield/shared', '@line-yield/liff-app', '@line-yield/web-app']
+  }
 })

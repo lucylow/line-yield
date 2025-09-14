@@ -635,3 +635,4 @@ export const NFTCollateral: React.FC<NFTCollateralProps> = ({ className }) => {
     </div>
   );
 };
+

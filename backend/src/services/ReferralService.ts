@@ -3,7 +3,7 @@ import { Logger } from '../utils/logger';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const logger = new Logger();
+// Logger instance removed - using static methods directly
 
 // Initialize Supabase client with service role key (backend only)
 const supabase = createClient(CONFIG.supabase.url, CONFIG.supabase.serviceRoleKey);

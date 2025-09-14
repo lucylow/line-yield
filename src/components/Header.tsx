@@ -7,10 +7,13 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { MobileNavigation } from './MobileNavigation';
 import { SettingsPanel } from './SettingsPanel';
 import { AuthModal } from './AuthModal';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useTranslation } from '../i18n';
 
 export const Header = () => {
   const { wallet, connectWallet } = useWallet();
   const { user, signOut, isAuthenticated } = useSupabaseAuth();
+  const { t } = useTranslation();
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -93,10 +96,7 @@ export const Header = () => {
           </nav>
 
           {/* Mobile Navigation */}
-          <MobileNavigation 
-            wallet={wallet} 
-            onConnectWallet={connectWallet}
-          />
+          <MobileNavigation />
           
           <div className="flex gap-4 items-center">
             {/* Settings Button */}

@@ -3,6 +3,7 @@ export { usePlatform } from './hooks/usePlatform'
 export { useUniversalWallet } from './hooks/useUniversalWallet'
 
 // Components
+export { Layout } from './components/Layout'
 export { ConnectWallet } from './components/ConnectWallet'
 export { LoanTypes } from './components/LoanTypes'
 export { LoanCreator } from './components/LoanCreator'

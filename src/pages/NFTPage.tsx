@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { NFTCollection } from '@shared/components/NFTCollection';
-import { NFTMinter } from '@shared/components/NFTMinter';
-import { cn } from '../utils/cn';
+import { NFTCollection } from '../components/nft/NFTCollection';
+import { NFTMinter } from '../components/nft/NFTMinter';
+import { NFTMarketplace } from '../components/nft/NFTMarketplace';
+import { NFTAnalytics } from '../components/nft/NFTAnalytics';
+import { NFTStaking } from '../components/nft/NFTStaking';
+import { cn } from '../lib/utils';
 
 interface NFTTier {
   tier: number;
@@ -23,7 +26,7 @@ export const NFTPage: React.FC = () => {
   const [nftTiers, setNftTiers] = useState<NFTTier[]>([]);
   const [nftStats, setNftStats] = useState<NFTStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'collection' | 'mint' | 'tiers'>('collection');
+  const [activeTab, setActiveTab] = useState<'collection' | 'mint' | 'marketplace' | 'staking' | 'analytics' | 'tiers'>('collection');
 
   // Mock wallet connection - in real app this would come from wallet context
   useEffect(() => {
@@ -175,6 +178,9 @@ export const NFTPage: React.FC = () => {
               {[
                 { id: 'collection', label: 'My Collection', icon: '🏆' },
                 { id: 'mint', label: 'Mint NFT', icon: '🎨' },
+                { id: 'marketplace', label: 'Marketplace', icon: '🛒' },
+                { id: 'staking', label: 'Staking', icon: '⚡' },
+                { id: 'analytics', label: 'Analytics', icon: '📊' },
                 { id: 'tiers', label: 'All Tiers', icon: '⭐' }
               ].map((tab) => (
                 <button
@@ -209,6 +215,24 @@ export const NFTPage: React.FC = () => {
                 userAddress={userAddress} 
                 onMintSuccess={handleMintSuccess}
               />
+            </div>
+          )}
+
+          {activeTab === 'marketplace' && (
+            <div className="lg:col-span-3">
+              <NFTMarketplace />
+            </div>
+          )}
+
+          {activeTab === 'staking' && (
+            <div className="lg:col-span-3">
+              <NFTStaking />
+            </div>
+          )}
+
+          {activeTab === 'analytics' && (
+            <div className="lg:col-span-3">
+              <NFTAnalytics />
             </div>
           )}
 

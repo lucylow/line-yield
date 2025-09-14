@@ -1,358 +1,356 @@
-import { Router, Request, Response } from 'express';
-import { paymentService } from '../services/PaymentService';
-import { Logger } from '../utils/logger';
-import rateLimit from 'express-rate-limit';
-import { CONFIG } from '../config';
+import express from 'express';
+import { PaymentService } from '../services/PaymentService';
+import { supabase } from '../services/supabase';
+import { ethers } from 'ethers';
 
-const logger = new Logger('PaymentsRoutes');
-const router = Router();
+const router = express.Router();
+const paymentService = new PaymentService(supabase);
 
-// Rate limiting for payment endpoints
-const paymentRateLimit = rateLimit({
-  windowMs: CONFIG.security.rateLimitWindowMs,
-  max: 10, // Lower limit for payment endpoints
-  message: {
-    error: 'Too many payment requests from this IP, please try again later.',
-    retryAfter: Math.ceil(CONFIG.security.rateLimitWindowMs / 1000)
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Middleware to validate user ID
-const validateUserId = (req: Request, res: Response, next: any) => {
-  const { userId } = req.params;
-  
-  if (!userId || !/^[a-zA-Z0-9_-]+$/.test(userId)) {
-    return res.status(400).json({
-      error: 'Invalid user ID format'
-    });
-  }
-
-  next();
-};
-
-// Middleware to validate payment amount
-const validateAmount = (req: Request, res: Response, next: any) => {
-  const { amount } = req.body;
-  
-  if (!amount || isNaN(amount) || amount <= 0) {
-    return res.status(400).json({
-      error: 'Invalid amount. Must be a positive number.'
-    });
-  }
-
-  next();
-};
-
-/**
- * POST /payments/stripe/create-intent
- * Create Stripe payment intent
- */
-router.post('/stripe/create-intent', 
-  paymentRateLimit,
-  validateAmount,
-  async (req: Request, res: Response) => {
-    try {
-      const { amount, currency = 'usd', userId, metadata } = req.body;
-      
-      if (!userId) {
-        return res.status(400).json({
-          error: 'User ID is required'
-        });
-      }
-
-      const paymentIntent = await paymentService.createStripePaymentIntent(
-        amount,
-        currency,
-        userId,
-        metadata
-      );
-      
-      res.json({
-        success: true,
-        data: paymentIntent
-      });
-    } catch (error) {
-      logger.error('Error creating Stripe payment intent:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to create payment intent'
-      });
-    }
-  }
-);
-
-/**
- * POST /payments/stripe/confirm
- * Confirm Stripe payment
- */
-router.post('/stripe/confirm', 
-  paymentRateLimit,
-  async (req: Request, res: Response) => {
-    try {
-      const { paymentIntentId } = req.body;
-      
-      if (!paymentIntentId) {
-        return res.status(400).json({
-          error: 'Payment intent ID is required'
-        });
-      }
-
-      const payment = await paymentService.confirmStripePayment(paymentIntentId);
-      
-      res.json({
-        success: true,
-        data: payment
-      });
-    } catch (error) {
-      logger.error('Error confirming Stripe payment:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to confirm payment'
-      });
-    }
-  }
-);
-
-/**
- * POST /payments/crypto/create
- * Create crypto payment
- */
-router.post('/crypto/create', 
-  paymentRateLimit,
-  validateAmount,
-  async (req: Request, res: Response) => {
-    try {
-      const { amount, token, recipientAddress, userId, network = 'kaia' } = req.body;
-      
-      if (!userId || !token || !recipientAddress) {
-        return res.status(400).json({
-          error: 'User ID, token, and recipient address are required'
-        });
-      }
-
-      const cryptoPayment = await paymentService.createCryptoPayment(
-        amount,
-        token,
-        recipientAddress,
-        userId,
-        network
-      );
-      
-      res.json({
-        success: true,
-        data: cryptoPayment
-      });
-    } catch (error) {
-      logger.error('Error creating crypto payment:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to create crypto payment'
-      });
-    }
-  }
-);
-
-/**
- * PUT /payments/crypto/:paymentId
- * Update crypto payment with transaction hash
- */
-router.put('/crypto/:paymentId', 
-  paymentRateLimit,
-  async (req: Request, res: Response) => {
-    try {
-      const { paymentId } = req.params;
-      const { txHash, status } = req.body;
-      
-      if (!txHash || !status) {
-        return res.status(400).json({
-          error: 'Transaction hash and status are required'
-        });
-      }
-
-      if (!['confirmed', 'failed'].includes(status)) {
-        return res.status(400).json({
-          error: 'Status must be either "confirmed" or "failed"'
-        });
-      }
-
-      const payment = await paymentService.updateCryptoPayment(paymentId, txHash, status);
-      
-      res.json({
-        success: true,
-        data: payment
-      });
-    } catch (error) {
-      logger.error('Error updating crypto payment:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to update crypto payment'
-      });
-    }
-  }
-);
-
-/**
- * GET /payments/history/:userId
- * Get payment history for user
- */
-router.get('/history/:userId', 
-  paymentRateLimit,
-  validateUserId,
-  async (req: Request, res: Response) => {
-    try {
-      const { userId } = req.params;
-      const { limit = 50 } = req.query;
-      
-      const history = await paymentService.getPaymentHistory(userId, parseInt(limit as string));
-      
-      res.json({
-        success: true,
-        data: history
-      });
-    } catch (error) {
-      logger.error('Error getting payment history:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to get payment history'
-      });
-    }
-  }
-);
-
-/**
- * GET /payments/:paymentId
- * Get payment by ID
- */
-router.get('/:paymentId', 
-  paymentRateLimit,
-  async (req: Request, res: Response) => {
-    try {
-      const { paymentId } = req.params;
-      
-      const payment = await paymentService.getPaymentById(paymentId);
-      
-      if (!payment) {
-        return res.status(404).json({
-          error: 'Payment not found'
-        });
-      }
-      
-      res.json({
-        success: true,
-        data: payment
-      });
-    } catch (error) {
-      logger.error('Error getting payment:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to get payment'
-      });
-    }
-  }
-);
-
-/**
- * POST /payments/:paymentId/refund
- * Process refund
- */
-router.post('/:paymentId/refund', 
-  paymentRateLimit,
-  async (req: Request, res: Response) => {
-    try {
-      const { paymentId } = req.params;
-      const { reason } = req.body;
-      
-      const refund = await paymentService.processRefund(paymentId, reason);
-      
-      res.json({
-        success: true,
-        data: refund
-      });
-    } catch (error) {
-      logger.error('Error processing refund:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to process refund'
-      });
-    }
-  }
-);
-
-/**
- * GET /payments/stats/:userId?
- * Get payment statistics
- */
-router.get('/stats/:userId?', 
-  paymentRateLimit,
-  async (req: Request, res: Response) => {
-    try {
-      const { userId } = req.params;
-      
-      const stats = await paymentService.getPaymentStats(userId);
-      
-      res.json({
-        success: true,
-        data: stats
-      });
-    } catch (error) {
-      logger.error('Error getting payment stats:', error);
-      res.status(500).json({
-        error: error instanceof Error ? error.message : 'Failed to get payment statistics'
-      });
-    }
-  }
-);
-
-/**
- * POST /payments/webhooks/stripe
- * Handle Stripe webhooks
- */
-router.post('/webhooks/stripe', 
-  async (req: Request, res: Response) => {
-    try {
-      const signature = req.headers['stripe-signature'] as string;
-      
-      if (!signature) {
-        return res.status(400).json({
-          error: 'Missing Stripe signature'
-        });
-      }
-
-      const event = paymentService.verifyStripeWebhook(JSON.stringify(req.body), signature);
-      
-      await paymentService.handleStripeWebhook(event);
-      
-      res.json({ received: true });
-    } catch (error) {
-      logger.error('Error handling Stripe webhook:', error);
-      res.status(400).json({
-        error: error instanceof Error ? error.message : 'Webhook handling failed'
-      });
-    }
-  }
-);
-
-/**
- * GET /payments/health
- * Health check endpoint
- */
-router.get('/health', async (req: Request, res: Response) => {
+// Initialize payment service
+const initializePaymentService = async () => {
   try {
+    const provider = new ethers.providers.JsonRpcProvider(process.env.KAIA_RPC_URL);
+    const yieldTokenAddress = process.env.YIELD_TOKEN_CONTRACT;
+    
+    if (!yieldTokenAddress) {
+      throw new Error('YIELD_TOKEN_CONTRACT environment variable not set');
+    }
+    
+    await paymentService.initialize(provider, yieldTokenAddress);
+    console.log('Payment service initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize payment service:', error);
+  }
+};
+
+// Initialize on startup
+initializePaymentService();
+
+/**
+ * POST /api/payments/crypto
+ * Process crypto payment
+ */
+router.post('/crypto', async (req, res) => {
+  try {
+    const { userAddress, itemId, amount, currency } = req.body;
+    
+    if (!userAddress || !itemId || !amount || !currency) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: userAddress, itemId, amount, currency'
+      });
+    }
+
+    if (!ethers.utils.isAddress(userAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid wallet address'
+      });
+    }
+
+    const payment = {
+      method: 'crypto' as const,
+      currency: currency as 'YIELD' | 'KAIA' | 'USDT',
+      amount,
+      userAddress,
+      itemId
+    };
+
+    const result = await paymentService.processCryptoPayment(payment);
+    
     res.json({
-      success: true,
+      success: result.success,
       data: {
-        status: 'healthy',
-        service: 'payments',
-        timestamp: new Date().toISOString(),
-        supportedMethods: ['stripe', 'crypto'],
-        supportedCurrencies: ['usd', 'usdc', 'kaia-usdt'],
-        supportedNetworks: ['kaia', 'ethereum', 'polygon']
+        transactionId: result.transactionId,
+        status: result.status,
+        message: result.success ? 'Payment processed successfully' : result.error
       }
     });
   } catch (error) {
-    logger.error('Health check failed:', error);
+    console.error('Crypto payment error:', error);
     res.status(500).json({
       success: false,
-      error: 'Health check failed'
+      error: 'Failed to process crypto payment'
+    });
+  }
+});
+
+/**
+ * POST /api/payments/stripe
+ * Process Stripe payment
+ */
+router.post('/stripe', async (req, res) => {
+  try {
+    const { userEmail, itemId, amount, currency, paymentMethodId } = req.body;
+    
+    if (!userEmail || !itemId || !amount || !currency) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: userEmail, itemId, amount, currency'
+      });
+    }
+
+    const payment = {
+      method: 'stripe' as const,
+      currency: currency as 'USD' | 'KRW' | 'JPY' | 'TWD' | 'THB',
+      amount,
+      userEmail,
+      itemId,
+      paymentMethodId
+    };
+
+    const result = await paymentService.processStripePayment(payment);
+    
+    res.json({
+      success: result.success,
+      data: {
+        paymentIntentId: result.paymentIntentId,
+        status: result.status,
+        message: result.success ? 'Payment processed successfully' : result.error
+      }
+    });
+  } catch (error) {
+    console.error('Stripe payment error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process Stripe payment'
+    });
+  }
+});
+
+/**
+ * POST /api/payments/stripe/customer
+ * Create Stripe customer
+ */
+router.post('/stripe/customer', async (req, res) => {
+  try {
+    const { email, name } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email is required'
+      });
+    }
+
+    const customerId = await paymentService.createStripeCustomer(email, name);
+    
+    res.json({
+      success: true,
+      data: {
+        customerId,
+        message: 'Customer created successfully'
+      }
+    });
+  } catch (error) {
+    console.error('Stripe customer creation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create Stripe customer'
+    });
+  }
+});
+
+/**
+ * GET /api/payments/stripe/customer/:customerId/payment-methods
+ * Get customer payment methods
+ */
+router.get('/stripe/customer/:customerId/payment-methods', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    
+    const paymentMethods = await paymentService.getCustomerPaymentMethods(customerId);
+    
+    res.json({
+      success: true,
+      data: paymentMethods
+    });
+  } catch (error) {
+    console.error('Error fetching payment methods:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch payment methods'
+    });
+  }
+});
+
+/**
+ * GET /api/payments/inventory/:userId
+ * Get user inventory
+ */
+router.get('/inventory/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const inventory = await paymentService.getUserInventory(userId);
+    
+    res.json({
+      success: true,
+      data: inventory
+    });
+  } catch (error) {
+    console.error('Error fetching inventory:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch user inventory'
+    });
+  }
+});
+
+/**
+ * GET /api/payments/history/:userId
+ * Get payment history
+ */
+router.get('/history/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const limit = parseInt(req.query.limit as string) || 50;
+    
+    const history = await paymentService.getPaymentHistory(userId, limit);
+    
+    res.json({
+      success: true,
+      data: history
+    });
+  } catch (error) {
+    console.error('Error fetching payment history:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch payment history'
+    });
+  }
+});
+
+/**
+ * POST /api/payments/refund
+ * Process refund
+ */
+router.post('/refund', async (req, res) => {
+  try {
+    const { transactionId, reason } = req.body;
+    
+    if (!transactionId || !reason) {
+      return res.status(400).json({
+        success: false,
+        error: 'Transaction ID and reason are required'
+      });
+    }
+
+    const result = await paymentService.processRefund(transactionId, reason);
+    
+    res.json({
+      success: result.success,
+      data: {
+        transactionId: result.paymentIntentId,
+        status: result.status,
+        message: result.success ? 'Refund processed successfully' : result.error
+      }
+    });
+  } catch (error) {
+    console.error('Refund error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process refund'
+    });
+  }
+});
+
+/**
+ * GET /api/payments/stats
+ * Get payment statistics
+ */
+router.get('/stats', async (req, res) => {
+  try {
+    const stats = await paymentService.getPaymentStats();
+    
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Error fetching payment stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch payment statistics'
+    });
+  }
+});
+
+/**
+ * GET /api/payments/currencies
+ * Get supported currencies
+ */
+router.get('/currencies', async (req, res) => {
+  try {
+    const currencies = paymentService.getSupportedCurrencies();
+    
+    res.json({
+      success: true,
+      data: currencies
+    });
+  } catch (error) {
+    console.error('Error fetching currencies:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch supported currencies'
+    });
+  }
+});
+
+/**
+ * POST /api/payments/validate
+ * Validate payment method
+ */
+router.post('/validate', async (req, res) => {
+  try {
+    const payment = req.body;
+    
+    const isValid = await paymentService.validatePaymentMethod(payment);
+    
+    res.json({
+      success: true,
+      data: {
+        isValid,
+        message: isValid ? 'Payment method is valid' : 'Payment method is invalid'
+      }
+    });
+  } catch (error) {
+    console.error('Payment validation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to validate payment method'
+    });
+  }
+});
+
+/**
+ * POST /api/payments/calculate-fees
+ * Calculate payment fees
+ */
+router.post('/calculate-fees', async (req, res) => {
+  try {
+    const { amount, currency, paymentMethod } = req.body;
+    
+    if (!amount || !currency || !paymentMethod) {
+      return res.status(400).json({
+        success: false,
+        error: 'Amount, currency, and payment method are required'
+      });
+    }
+
+    const fees = paymentService.calculateFees(amount, currency, paymentMethod);
+    
+    res.json({
+      success: true,
+      data: fees
+    });
+  } catch (error) {
+    console.error('Fee calculation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate fees'
     });
   }
 });
 
 export default router;
-
-

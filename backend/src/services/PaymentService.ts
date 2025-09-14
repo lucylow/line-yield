@@ -1,455 +1,487 @@
-import Stripe from 'stripe';
-import { CONFIG } from '../config';
-import { Logger } from '../utils/logger';
-import { createClient } from '@supabase/supabase-js';
 import { ethers } from 'ethers';
+import Stripe from 'stripe';
+import { SupabaseClient } from '@supabase/supabase-js';
 
-const logger = new Logger('PaymentService');
-
-// Initialize Stripe with secret key
-const stripe = new Stripe(CONFIG.stripe.secretKey, {
-  apiVersion: '2023-10-16',
-});
-
-// Initialize Supabase client
-const supabase = createClient(CONFIG.supabase.url, CONFIG.supabase.serviceRoleKey);
-
-export interface PaymentIntent {
-  id: string;
-  amount: number;
+interface PaymentMethod {
+  type: 'crypto' | 'stripe';
   currency: string;
-  status: 'requires_payment_method' | 'requires_confirmation' | 'requires_action' | 'processing' | 'requires_capture' | 'canceled' | 'succeeded';
-  clientSecret: string;
-  metadata?: Record<string, string>;
+  amount: number;
 }
 
-export interface CryptoPayment {
-  id: string;
+interface CryptoPayment {
+  method: 'crypto';
+  currency: 'YIELD' | 'KAIA' | 'USDT';
   amount: string;
-  token: string;
-  recipientAddress: string;
-  txHash?: string;
-  status: 'pending' | 'confirmed' | 'failed';
-  network: 'kaia' | 'ethereum' | 'polygon';
+  userAddress: string;
+  itemId: string;
 }
 
-export interface PaymentRecord {
-  id: string;
-  userId: string;
-  type: 'stripe' | 'crypto';
+interface StripePayment {
+  method: 'stripe';
+  currency: 'USD' | 'KRW' | 'JPY' | 'TWD' | 'THB';
   amount: number;
-  currency: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  userEmail: string;
+  itemId: string;
+  paymentMethodId?: string;
+}
+
+interface PaymentResult {
+  success: boolean;
+  transactionId?: string;
   paymentIntentId?: string;
-  txHash?: string;
-  metadata?: Record<string, any>;
-  createdAt: string;
-  updatedAt: string;
+  error?: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+}
+
+interface UserInventory {
+  userId: string;
+  items: Array<{
+    itemId: string;
+    quantity: number;
+    purchasedAt: string;
+    expiresAt?: string;
+    isActive: boolean;
+  }>;
 }
 
 export class PaymentService {
-  private static instance: PaymentService;
-  
-  private constructor() {}
+  private stripe: Stripe;
+  private provider: ethers.providers.Provider | null = null;
+  private supabase: SupabaseClient;
+  private yieldTokenContract: ethers.Contract | null = null;
 
-  public static getInstance(): PaymentService {
-    if (!PaymentService.instance) {
-      PaymentService.instance = new PaymentService();
-    }
-    return PaymentService.instance;
+  constructor(supabase: SupabaseClient) {
+    this.supabase = supabase;
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: '2023-10-16',
+    });
+  }
+
+  async initialize(provider: ethers.providers.Provider, yieldTokenAddress: string) {
+    this.provider = provider;
+    
+    // YieldToken contract ABI (simplified)
+    const contractABI = [
+      'function transfer(address to, uint256 amount) external returns (bool)',
+      'function transferFrom(address from, address to, uint256 amount) external returns (bool)',
+      'function approve(address spender, uint256 amount) external returns (bool)',
+      'function allowance(address owner, address spender) external view returns (uint256)',
+      'function balanceOf(address account) external view returns (uint256)',
+      'event Transfer(address indexed from, address indexed to, uint256 value)'
+    ];
+
+    this.yieldTokenContract = new ethers.Contract(yieldTokenAddress, contractABI, provider);
   }
 
   /**
-   * Create Stripe payment intent
+   * Process crypto payment
    */
-  public async createStripePaymentIntent(
-    amount: number,
-    currency: string = 'usd',
-    userId: string,
-    metadata?: Record<string, string>
-  ): Promise<PaymentIntent> {
+  async processCryptoPayment(payment: CryptoPayment): Promise<PaymentResult> {
     try {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(amount * 100), // Convert to cents
-        currency: currency.toLowerCase(),
-        payment_method_types: ['card'],
+      if (!this.yieldTokenContract) {
+        throw new Error('YieldToken contract not initialized');
+      }
+
+      const userAddress = payment.userAddress;
+      const amount = ethers.utils.parseEther(payment.amount);
+      
+      // Check user balance
+      const balance = await this.yieldTokenContract.balanceOf(userAddress);
+      if (balance.lt(amount)) {
+        return {
+          success: false,
+          error: 'Insufficient balance',
+          status: 'failed'
+        };
+      }
+
+      // Get platform wallet address (where payments go)
+      const platformAddress = process.env.PLATFORM_WALLET_ADDRESS;
+      if (!platformAddress) {
+        throw new Error('Platform wallet address not configured');
+      }
+
+      // Create transaction
+      const signer = this.provider!.getSigner(userAddress);
+      const contractWithSigner = this.yieldTokenContract.connect(signer);
+      
+      const tx = await contractWithSigner.transfer(platformAddress, amount);
+      
+      // Wait for confirmation
+      const receipt = await tx.wait();
+      
+      if (receipt.status === 1) {
+        // Payment successful, add item to user inventory
+        await this.addItemToInventory(userAddress, payment.itemId, 1);
+        
+        // Log payment
+        await this.logPayment({
+          userId: userAddress,
+          itemId: payment.itemId,
+          amount: payment.amount,
+          currency: payment.currency,
+          method: 'crypto',
+          transactionHash: tx.hash,
+          status: 'completed'
+        });
+
+        return {
+          success: true,
+          transactionId: tx.hash,
+          status: 'completed'
+        };
+      } else {
+        return {
+          success: false,
+          error: 'Transaction failed',
+          status: 'failed'
+        };
+      }
+    } catch (error) {
+      console.error('Crypto payment error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        status: 'failed'
+      };
+    }
+  }
+
+  /**
+   * Process Stripe payment
+   */
+  async processStripePayment(payment: StripePayment): Promise<PaymentResult> {
+    try {
+      // Create payment intent
+      const paymentIntent = await this.stripe.paymentIntents.create({
+        amount: Math.round(payment.amount * 100), // Convert to cents
+        currency: payment.currency.toLowerCase(),
+        customer_email: payment.userEmail,
         metadata: {
-          userId,
-          ...metadata
+          itemId: payment.itemId,
+          userId: payment.userEmail // Using email as user ID for Stripe
         },
         automatic_payment_methods: {
           enabled: true,
         },
       });
 
-      // Store payment record in Supabase
-      await this.createPaymentRecord({
-        userId,
-        type: 'stripe',
-        amount,
-        currency,
-        status: 'pending',
-        paymentIntentId: paymentIntent.id,
-        metadata
-      });
+      // If payment method is provided, confirm the payment
+      if (payment.paymentMethodId) {
+        const confirmedPayment = await this.stripe.paymentIntents.confirm(
+          paymentIntent.id,
+          {
+            payment_method: payment.paymentMethodId,
+          }
+        );
 
-      logger.info(`Stripe payment intent created: ${paymentIntent.id} for user ${userId}`);
+        if (confirmedPayment.status === 'succeeded') {
+          // Payment successful, add item to user inventory
+          await this.addItemToInventory(payment.userEmail, payment.itemId, 1);
+          
+          // Log payment
+          await this.logPayment({
+            userId: payment.userEmail,
+            itemId: payment.itemId,
+            amount: payment.amount.toString(),
+            currency: payment.currency,
+            method: 'stripe',
+            transactionHash: confirmedPayment.id,
+            status: 'completed'
+          });
 
-      return {
-        id: paymentIntent.id,
-        amount: paymentIntent.amount / 100, // Convert back from cents
-        currency: paymentIntent.currency,
-        status: paymentIntent.status,
-        clientSecret: paymentIntent.client_secret!,
-        metadata: paymentIntent.metadata
-      };
-    } catch (error) {
-      logger.error('Error creating Stripe payment intent:', error);
-      throw new Error('Failed to create payment intent');
-    }
-  }
-
-  /**
-   * Confirm Stripe payment
-   */
-  public async confirmStripePayment(paymentIntentId: string): Promise<PaymentRecord> {
-    try {
-      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-      
-      if (paymentIntent.status === 'succeeded') {
-        // Update payment record in Supabase
-        const { data, error } = await supabase
-          .from('payments')
-          .update({
-            status: 'completed',
-            updated_at: new Date().toISOString()
-          })
-          .eq('payment_intent_id', paymentIntentId)
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        logger.info(`Stripe payment confirmed: ${paymentIntentId}`);
-        return data;
+          return {
+            success: true,
+            paymentIntentId: confirmedPayment.id,
+            status: 'completed'
+          };
+        }
       }
 
-      throw new Error(`Payment not succeeded: ${paymentIntent.status}`);
-    } catch (error) {
-      logger.error('Error confirming Stripe payment:', error);
-      throw new Error('Failed to confirm payment');
-    }
-  }
-
-  /**
-   * Create crypto payment
-   */
-  public async createCryptoPayment(
-    amount: string,
-    token: string,
-    recipientAddress: string,
-    userId: string,
-    network: 'kaia' | 'ethereum' | 'polygon' = 'kaia'
-  ): Promise<CryptoPayment> {
-    try {
-      const paymentId = `crypto_${Date.now()}_${userId}`;
-      
-      // Store payment record in Supabase
-      const { data, error } = await supabase
-        .from('payments')
-        .insert([{
-          id: paymentId,
-          user_id: userId,
-          type: 'crypto',
-          amount: parseFloat(amount),
-          currency: token.toUpperCase(),
-          status: 'pending',
-          metadata: {
-            network,
-            recipient_address: recipientAddress,
-            token
-          },
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      logger.info(`Crypto payment created: ${paymentId} for user ${userId}`);
-
       return {
-        id: paymentId,
-        amount,
-        token,
-        recipientAddress,
-        status: 'pending',
-        network
+        success: true,
+        paymentIntentId: paymentIntent.id,
+        status: 'pending'
       };
     } catch (error) {
-      logger.error('Error creating crypto payment:', error);
-      throw new Error('Failed to create crypto payment');
+      console.error('Stripe payment error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        status: 'failed'
+      };
     }
   }
 
   /**
-   * Update crypto payment with transaction hash
+   * Create Stripe customer
    */
-  public async updateCryptoPayment(
-    paymentId: string,
-    txHash: string,
-    status: 'confirmed' | 'failed'
-  ): Promise<PaymentRecord> {
-    try {
-      const { data, error } = await supabase
-        .from('payments')
-        .update({
-          tx_hash: txHash,
-          status: status === 'confirmed' ? 'completed' : 'failed',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', paymentId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      logger.info(`Crypto payment updated: ${paymentId} with tx ${txHash}`);
-      return data;
-    } catch (error) {
-      logger.error('Error updating crypto payment:', error);
-      throw new Error('Failed to update crypto payment');
-    }
+  async createStripeCustomer(email: string, name?: string): Promise<string> {
+    const customer = await this.stripe.customers.create({
+      email,
+      name,
+    });
+    return customer.id;
   }
 
   /**
-   * Get payment history for user
+   * Get payment methods for a customer
    */
-  public async getPaymentHistory(userId: string, limit: number = 50): Promise<PaymentRecord[]> {
-    try {
-      const { data, error } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      logger.error('Error getting payment history:', error);
-      throw new Error('Failed to get payment history');
-    }
+  async getCustomerPaymentMethods(customerId: string): Promise<Stripe.PaymentMethod[]> {
+    const paymentMethods = await this.stripe.paymentMethods.list({
+      customer: customerId,
+      type: 'card',
+    });
+    return paymentMethods.data;
   }
 
   /**
-   * Get payment by ID
+   * Add item to user inventory
    */
-  public async getPaymentById(paymentId: string): Promise<PaymentRecord | null> {
-    try {
-      const { data, error } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('id', paymentId)
-        .single();
+  private async addItemToInventory(userId: string, itemId: string, quantity: number): Promise<void> {
+    const { error } = await this.supabase
+      .from('user_inventory')
+      .upsert({
+        user_id: userId,
+        item_id: itemId,
+        quantity: quantity,
+        purchased_at: new Date().toISOString(),
+        is_active: true
+      }, {
+        onConflict: 'user_id,item_id'
+      });
 
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    } catch (error) {
-      logger.error('Error getting payment by ID:', error);
-      throw new Error('Failed to get payment');
-    }
+    if (error) throw error;
+  }
+
+  /**
+   * Get user inventory
+   */
+  async getUserInventory(userId: string): Promise<UserInventory> {
+    const { data, error } = await this.supabase
+      .from('user_inventory')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_active', true);
+
+    if (error) throw error;
+
+    return {
+      userId,
+      items: data?.map(item => ({
+        itemId: item.item_id,
+        quantity: item.quantity,
+        purchasedAt: item.purchased_at,
+        expiresAt: item.expires_at,
+        isActive: item.is_active
+      })) || []
+    };
+  }
+
+  /**
+   * Log payment transaction
+   */
+  private async logPayment(payment: {
+    userId: string;
+    itemId: string;
+    amount: string;
+    currency: string;
+    method: string;
+    transactionHash: string;
+    status: string;
+  }): Promise<void> {
+    const { error } = await this.supabase
+      .from('payment_transactions')
+      .insert({
+        user_id: payment.userId,
+        item_id: payment.itemId,
+        amount: payment.amount,
+        currency: payment.currency,
+        payment_method: payment.method,
+        transaction_hash: payment.transactionHash,
+        status: payment.status,
+        created_at: new Date().toISOString()
+      });
+
+    if (error) throw error;
+  }
+
+  /**
+   * Get payment history for a user
+   */
+  async getPaymentHistory(userId: string, limit: number = 50): Promise<any[]> {
+    const { data, error } = await this.supabase
+      .from('payment_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data || [];
   }
 
   /**
    * Process refund
    */
-  public async processRefund(paymentId: string, reason?: string): Promise<PaymentRecord> {
+  async processRefund(transactionId: string, reason: string): Promise<PaymentResult> {
     try {
-      const payment = await this.getPaymentById(paymentId);
-      if (!payment) throw new Error('Payment not found');
-
-      if (payment.type === 'stripe' && payment.paymentIntentId) {
-        // Process Stripe refund
-        const refund = await stripe.refunds.create({
-          payment_intent: payment.paymentIntentId,
-          reason: reason ? 'requested_by_customer' : undefined
+      // Check if it's a Stripe payment
+      if (transactionId.startsWith('pi_')) {
+        const refund = await this.stripe.refunds.create({
+          payment_intent: transactionId,
+          reason: 'requested_by_customer',
+          metadata: {
+            reason
+          }
         });
 
-        // Update payment record
-        const { data, error } = await supabase
-          .from('payments')
-          .update({
-            status: 'refunded',
-            metadata: {
-              ...payment.metadata,
-              refund_id: refund.id,
-              refund_reason: reason
-            },
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', paymentId)
-          .select()
-          .single();
+        // Update payment status
+        await this.supabase
+          .from('payment_transactions')
+          .update({ status: 'refunded' })
+          .eq('transaction_hash', transactionId);
 
-        if (error) throw error;
-        return data;
+        return {
+          success: true,
+          paymentIntentId: refund.id,
+          status: 'refunded'
+        };
       } else {
-        // For crypto payments, we can only mark as refunded in our system
-        const { data, error } = await supabase
-          .from('payments')
-          .update({
-            status: 'refunded',
-            metadata: {
-              ...payment.metadata,
-              refund_reason: reason
-            },
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', paymentId)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
+        // For crypto payments, we would need to implement a refund mechanism
+        // This could involve transferring tokens back to the user
+        return {
+          success: false,
+          error: 'Crypto refunds not implemented',
+          status: 'failed'
+        };
       }
     } catch (error) {
-      logger.error('Error processing refund:', error);
-      throw new Error('Failed to process refund');
-    }
-  }
-
-  /**
-   * Create payment record in Supabase
-   */
-  private async createPaymentRecord(paymentData: Omit<PaymentRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<PaymentRecord> {
-    try {
-      const { data, error } = await supabase
-        .from('payments')
-        .insert([{
-          user_id: paymentData.userId,
-          type: paymentData.type,
-          amount: paymentData.amount,
-          currency: paymentData.currency,
-          status: paymentData.status,
-          payment_intent_id: paymentData.paymentIntentId,
-          tx_hash: paymentData.txHash,
-          metadata: paymentData.metadata,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      logger.error('Error creating payment record:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get Stripe webhook signature verification
-   */
-  public verifyStripeWebhook(payload: string, signature: string): Stripe.Event {
-    try {
-      return stripe.webhooks.constructEvent(
-        payload,
-        signature,
-        CONFIG.stripe.webhookSecret
-      );
-    } catch (error) {
-      logger.error('Webhook signature verification failed:', error);
-      throw new Error('Invalid webhook signature');
-    }
-  }
-
-  /**
-   * Handle Stripe webhook events
-   */
-  public async handleStripeWebhook(event: Stripe.Event): Promise<void> {
-    try {
-      switch (event.type) {
-        case 'payment_intent.succeeded':
-          await this.confirmStripePayment(event.data.object.id);
-          break;
-        case 'payment_intent.payment_failed':
-          await this.handlePaymentFailure(event.data.object.id);
-          break;
-        default:
-          logger.info(`Unhandled webhook event type: ${event.type}`);
-      }
-    } catch (error) {
-      logger.error('Error handling webhook:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Handle payment failure
-   */
-  private async handlePaymentFailure(paymentIntentId: string): Promise<void> {
-    try {
-      await supabase
-        .from('payments')
-        .update({
-          status: 'failed',
-          updated_at: new Date().toISOString()
-        })
-        .eq('payment_intent_id', paymentIntentId);
-
-      logger.info(`Payment marked as failed: ${paymentIntentId}`);
-    } catch (error) {
-      logger.error('Error handling payment failure:', error);
-      throw error;
+      console.error('Refund error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        status: 'failed'
+      };
     }
   }
 
   /**
    * Get payment statistics
    */
-  public async getPaymentStats(userId?: string): Promise<{
-    totalPayments: number;
-    totalAmount: number;
-    successRate: number;
-    stripePayments: number;
+  async getPaymentStats(): Promise<{
+    totalRevenue: number;
     cryptoPayments: number;
+    stripePayments: number;
+    totalTransactions: number;
+    averageOrderValue: number;
   }> {
+    const { data, error } = await this.supabase
+      .from('payment_transactions')
+      .select('amount, currency, payment_method, status');
+
+    if (error) throw error;
+
+    const transactions = data || [];
+    const completedTransactions = transactions.filter(t => t.status === 'completed');
+    
+    const cryptoPayments = completedTransactions.filter(t => t.payment_method === 'crypto').length;
+    const stripePayments = completedTransactions.filter(t => t.payment_method === 'stripe').length;
+    
+    // Calculate total revenue (simplified - would need proper currency conversion)
+    const totalRevenue = completedTransactions.reduce((sum, t) => {
+      return sum + parseFloat(t.amount);
+    }, 0);
+
+    return {
+      totalRevenue,
+      cryptoPayments,
+      stripePayments,
+      totalTransactions: completedTransactions.length,
+      averageOrderValue: completedTransactions.length > 0 ? totalRevenue / completedTransactions.length : 0
+    };
+  }
+
+  /**
+   * Validate payment method
+   */
+  async validatePaymentMethod(payment: CryptoPayment | StripePayment): Promise<boolean> {
     try {
-      let query = supabase.from('payments').select('*');
-      
-      if (userId) {
-        query = query.eq('user_id', userId);
+      if (payment.method === 'crypto') {
+        const cryptoPayment = payment as CryptoPayment;
+        
+        // Validate wallet address
+        if (!ethers.utils.isAddress(cryptoPayment.userAddress)) {
+          return false;
+        }
+
+        // Validate amount
+        if (parseFloat(cryptoPayment.amount) <= 0) {
+          return false;
+        }
+
+        return true;
+      } else {
+        const stripePayment = payment as StripePayment;
+        
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(stripePayment.userEmail)) {
+          return false;
+        }
+
+        // Validate amount
+        if (stripePayment.amount <= 0) {
+          return false;
+        }
+
+        return true;
       }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      const payments = data || [];
-      const totalPayments = payments.length;
-      const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
-      const successfulPayments = payments.filter(p => p.status === 'completed').length;
-      const successRate = totalPayments > 0 ? (successfulPayments / totalPayments) * 100 : 0;
-      const stripePayments = payments.filter(p => p.type === 'stripe').length;
-      const cryptoPayments = payments.filter(p => p.type === 'crypto').length;
-
-      return {
-        totalPayments,
-        totalAmount,
-        successRate,
-        stripePayments,
-        cryptoPayments
-      };
     } catch (error) {
-      logger.error('Error getting payment stats:', error);
-      throw new Error('Failed to get payment statistics');
+      return false;
     }
   }
+
+  /**
+   * Get supported currencies
+   */
+  getSupportedCurrencies(): {
+    crypto: string[];
+    fiat: string[];
+  } {
+    return {
+      crypto: ['YIELD', 'KAIA', 'USDT'],
+      fiat: ['USD', 'KRW', 'JPY', 'TWD', 'THB']
+    };
+  }
+
+  /**
+   * Calculate fees
+   */
+  calculateFees(amount: number, currency: string, paymentMethod: 'crypto' | 'stripe'): {
+    amount: number;
+    fee: number;
+    total: number;
+    feePercentage: number;
+  } {
+    let feePercentage = 0;
+    
+    if (paymentMethod === 'crypto') {
+      feePercentage = 0.5; // 0.5% for crypto payments
+    } else {
+      // Stripe fees vary by country and payment method
+      feePercentage = 2.9; // 2.9% + 30¢ for most cards
+    }
+
+    const fee = amount * (feePercentage / 100);
+    const total = amount + fee;
+
+    return {
+      amount,
+      fee,
+      total,
+      feePercentage
+    };
+  }
 }
-
-// Export singleton instance
-export const paymentService = PaymentService.getInstance();
-
 

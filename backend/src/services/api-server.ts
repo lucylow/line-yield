@@ -4,7 +4,7 @@ import { Logger } from '../utils/logger';
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
-import rateLimit from 'express-rate-limit';
+// import rateLimit from 'express-rate-limit'; // Commented out - package not installed
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 
 // Import route modules
@@ -16,6 +16,9 @@ import lineVerificationRoutes from '../routes/line-verification';
 import richMenuRoutes from '../routes/rich-menu';
 import secureRoutes from '../routes/secure';
 import qrPaymentRoutes from '../routes/qr-payment';
+import paymentRoutes from '../routes/payments';
+import kaiaPaymentRoutes from '../routes/kaia-payments';
+import marketplaceRoutes from '../routes/marketplace';
 
 export class ApiServer {
   private app: express.Application;
@@ -53,7 +56,7 @@ export class ApiServer {
     // CORS configuration
     this.app.use(cors({
       origin: [
-        CONFIG.frontend?.url || 'http://localhost:3000',
+        'http://localhost:3000',
         'http://localhost:5173', // Vite dev server
         'https://liff.line.me', // LINE LIFF
         'https://liff-frontend.line.me', // LINE LIFF frontend
@@ -82,9 +85,9 @@ export class ApiServer {
 
   private async rateLimitMiddleware(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
     try {
-      await this.rateLimiter.consume(req.ip);
+      await this.rateLimiter.consume(req.ip || 'unknown');
       next();
-    } catch (rejRes) {
+    } catch (rejRes: any) {
       const secs = Math.round(rejRes.msBeforeNext / 1000) || 1;
       res.set('Retry-After', String(secs));
       res.status(429).json({
@@ -104,7 +107,7 @@ export class ApiServer {
           status: 'healthy',
           service: 'line-yield-api',
           timestamp: new Date().toISOString(),
-          version: process.env.npm_package_version || '1.0.0',
+          version: process.env['npm_package_version'] || '1.0.0',
           environment: CONFIG.nodeEnv,
           uptime: process.uptime(),
           memory: process.memoryUsage(),
@@ -121,6 +124,9 @@ export class ApiServer {
     this.app.use('/api/rich-menu', richMenuRoutes);
     this.app.use('/api/secure', secureRoutes);
     this.app.use('/api/qr-payment', qrPaymentRoutes);
+    this.app.use('/api/payments', paymentRoutes);
+    this.app.use('/api/kaia-payments', kaiaPaymentRoutes);
+    this.app.use('/api/marketplace', marketplaceRoutes);
 
     // API documentation endpoint
     this.app.get('/api', (req, res) => {
@@ -139,6 +145,7 @@ export class ApiServer {
           richMenu: '/api/rich-menu',
           secure: '/api/secure',
           qrPayment: '/api/qr-payment',
+          marketplace: '/api/marketplace',
         },
           documentation: 'https://docs.line-yield.com/api',
           support: 'https://support.line-yield.com',
@@ -156,10 +163,13 @@ export class ApiServer {
         availableEndpoints: [
           '/api/rewards',
           '/api/referral',
+          '/api/nft',
+          '/api/loans',
           '/api/line',
           '/api/rich-menu',
           '/api/secure',
           '/api/qr-payment',
+          '/api/marketplace',
         ]
       });
     });
