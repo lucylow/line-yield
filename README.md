@@ -103,23 +103,36 @@ Solidity ^0.8.19
 ### Prerequisites
 
 - Node.js 18+ 
-- npm or yarn
+- pnpm (recommended) or npm/yarn
 - Git
 
 ### Setup
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd line-yield-frontend
+   git clone https://github.com/lucylow/line-yield.git
+   cd line-yield
    ```
 
-2. **Install dependencies**
+2. **Create pnpm workspace configuration**
+   Create a file named `pnpm-workspace.yaml` in the root directory:
+   ```yaml
+   packages:
+     - 'packages/*'
+   ```
+
+3. **Install pnpm globally (if not already installed)**
    ```bash
-   npm install
+   npm install -g pnpm
    ```
 
-3. **Environment Configuration**
+4. **Install dependencies**
+   From the root directory, install all dependencies:
+   ```bash
+   pnpm install
+   ```
+
+5. **Environment Configuration**
    ```bash
    cp env.example .env
    ```
@@ -131,17 +144,26 @@ Solidity ^0.8.19
    VITE_API_BASE_URL=http://localhost:3000
    ```
 
-4. **Get Reown Project ID**
+6. **Get Reown Project ID**
    - Visit [Reown Dashboard](https://dashboard.reown.com)
    - Create a new project
    - Copy your Project ID to the `.env` file
 
-5. **Start development server**
+7. **Start development server**
+   
+   **For Web Application:**
    ```bash
-   npm run dev
+   cd packages/web-app
+   pnpm run dev
    ```
-
-The application will be available at `http://localhost:5173`
+   The web application will be available at `http://localhost:3001/`
+   
+   **For LIFF Application:**
+   ```bash
+   cd packages/liff-app
+   pnpm run dev
+   ```
+   The LIFF application will be available at `http://localhost:3000/`
 
 ## 📱 Platform Support
 
@@ -1016,6 +1038,39 @@ The application is fully responsive and supports:
    - Check browser console for errors
    - Verify wallet is installed and unlocked
    - Try refreshing the page
+
+### Setup Issues
+
+5. **"Module not found" or "Export not found" errors**
+   - Ensure `pnpm-workspace.yaml` is created in the root directory
+   - Run `pnpm install` from the root directory
+   - Check that all exports are properly defined in shared packages
+
+6. **"Application not running"**
+   - Verify you're in the correct package directory (`packages/web-app` or `packages/liff-app`)
+   - Ensure all dependencies are installed with `pnpm install`
+   - Check that the development server is started with `pnpm run dev`
+
+7. **"Missing exports" errors**
+   - Verify exports in `packages/shared/src/hooks/index.ts`:
+     ```typescript
+     export { useLineYield } from './useLineYield';
+     export { usePlatform } from './usePlatform';
+     ```
+   - Verify exports in `packages/shared/src/components/index.ts`:
+     ```typescript
+     export { Button } from './Button';
+     export { LoadingSpinner } from './LoadingSpinner';
+     export { ConnectWallet } from './ConnectWallet';
+     export { BalanceDisplay } from './BalanceDisplay';
+     export { TransactionHistory } from './TransactionHistory';
+     export { Layout } from './Layout';
+     ```
+
+8. **"Build failed"**
+   - Run `pnpm run build` from the specific package directory
+   - Check for TypeScript errors
+   - Ensure all dependencies are properly installed
 
 ### Debug Mode
 

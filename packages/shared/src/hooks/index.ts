@@ -35,3 +35,6 @@ export {
   useGamificationStats, 
   useGamificationEvents 
 } from './useGamification';
+
+// Export useConfirmationDialog from components
+export { useConfirmationDialog } from '../components/ConfirmationDialog';
