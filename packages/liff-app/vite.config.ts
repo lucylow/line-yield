@@ -1,13 +1,13 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import { resolve } from 'path';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@shared': resolve(__dirname, '../shared/src'),
-      '@': resolve(__dirname, 'src'),
+      "@": resolve(__dirname, "./src"),
+      "@shared": resolve(__dirname, "../shared/src"),
     },
   },
   define: {
@@ -16,10 +16,19 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false, // LIFF doesn't need sourcemaps
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          liff: ['@line/liff'],
+        }
+      }
+    }
   },
   server: {
     port: 3000,
-    https: true, // LIFF requires HTTPS
-  },
-});
+    https: true, // Required for LIFF
+    host: '0.0.0.0'
+  }
+})

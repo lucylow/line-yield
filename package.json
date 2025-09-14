@@ -1,11 +1,17 @@
 {
-  "name": "line-yield-frontend",
+  "name": "line-yield-monorepo",
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "workspaces": ["packages/*"],
   "scripts": {
     "dev": "vite",
+    "dev:liff": "pnpm --filter @line-yield/liff-app dev",
+    "dev:web": "pnpm --filter @line-yield/web-app dev",
     "build": "tsc && vite build",
+    "build:all": "pnpm --filter @line-yield/shared build && pnpm --filter @line-yield/liff-app build && pnpm --filter @line-yield/web-app build",
+    "build:liff": "pnpm --filter @line-yield/liff-app build",
+    "build:web": "pnpm --filter @line-yield/web-app build",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ReferralPromotion } from '@/packages/shared/components/ReferralPromotion';
+import { ReferralPromotion } from '@shared/components/ReferralPromotion';
 import { cn } from '../utils/cn';
 
 interface ReferralLeaderboardEntry {

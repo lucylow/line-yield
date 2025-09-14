@@ -1,114 +1,73 @@
-import { useState, useEffect, useCallback } from 'react';
-import { BrowserProvider, formatEther } from 'ethers';
-import { usePlatform } from './usePlatform';
-import { WalletService } from '../services/walletService';
-import { AccountService } from '../services/accountService';
+import { useState, useCallback } from 'react'
+import { usePlatform } from './usePlatform'
 
-interface WalletState {
-  isConnected: boolean;
-  address: string | null;
-  balance: string;
-  chainId: number | null;
-  provider: BrowserProvider | null;
-  walletType: string | null;
+interface WalletInfo {
+  isConnected: boolean
+  address: string | null
+  provider: any | null
 }
 
 export const useUniversalWallet = () => {
-  const { isLiff } = usePlatform();
-  const [wallet, setWallet] = useState<WalletState>({
+  const { isLiff } = usePlatform()
+  const [wallet, setWallet] = useState<WalletInfo>({
     isConnected: false,
     address: null,
-    balance: '0',
-    chainId: null,
-    provider: null,
-    walletType: null
-  });
+    provider: null
+  })
 
-  const walletService = new WalletService();
-  const accountService = new AccountService();
-
-  const connectWallet = useCallback(async (options?: { type?: string }) => {
+  const connectWallet = useCallback(async () => {
     try {
-      let walletType = options?.type;
-      
-      // Auto-detect wallet type based on platform
-      if (!walletType) {
-        walletType = isLiff ? 'line' : 'metamask';
+      if (isLiff) {
+        // LIFF wallet connection
+        if (typeof window !== 'undefined' && (window as any).liff) {
+          const liff = (window as any).liff
+          if (!liff.isLoggedIn()) {
+            liff.login()
+            return
+          }
+        }
+        
+        // Use LINE's built-in wallet or external wallet
+        if ((window as any).ethereum) {
+          const provider = (window as any).ethereum
+          const accounts = await provider.request({ method: 'eth_requestAccounts' })
+          const address = accounts[0]
+          
+          setWallet({
+            isConnected: true,
+            address,
+            provider
+          })
+        }
+      } else {
+        // Web wallet connection (MetaMask, etc.)
+        if (!(window as any).ethereum) {
+          throw new Error('No wallet found')
+        }
+        
+        const provider = (window as any).ethereum
+        const accounts = await provider.request({ method: 'eth_requestAccounts' })
+        const address = accounts[0]
+        
+        setWallet({
+          isConnected: true,
+          address,
+          provider
+        })
       }
-
-      const address = await walletService.connect({ 
-        type: walletType as any,
-        chainId: 1001 // Kaia Testnet
-      });
-
-      if (!address) return;
-
-      // Get provider and additional wallet info
-      const provider = walletService.getProvider();
-      if (!provider) {
-        throw new Error('Provider not available');
-      }
-
-      const balance = await provider.getBalance(address);
-      const network = await provider.getNetwork();
-
-      const newWalletState = {
-        isConnected: true,
-        address,
-        balance: formatEther(balance),
-        chainId: Number(network.chainId),
-        provider,
-        walletType
-      };
-
-      setWallet(newWalletState);
-
-      // Link account across platforms
-      await accountService.linkAccounts(address, isLiff ? 'liff-user-id' : undefined);
-
-      return address;
     } catch (error) {
-      console.error('Wallet connection failed:', error);
-      throw error;
+      console.error('Wallet connection failed:', error)
+      throw error
     }
-  }, [isLiff, walletService, accountService]);
+  }, [isLiff])
 
   const disconnectWallet = useCallback(() => {
     setWallet({
       isConnected: false,
       address: null,
-      balance: '0',
-      chainId: null,
-      provider: null,
-      walletType: null
-    });
-  }, []);
+      provider: null
+    })
+  }, [])
 
-  // Auto-connect on platform change
-  useEffect(() => {
-    const savedAddress = localStorage.getItem('wallet_address');
-    const savedType = localStorage.getItem('wallet_type');
-    
-    if (savedAddress && savedType) {
-      connectWallet({ type: savedType }).catch(console.error);
-    }
-  }, [isLiff, connectWallet]);
-
-  // Save wallet state
-  useEffect(() => {
-    if (wallet.address && wallet.walletType) {
-      localStorage.setItem('wallet_address', wallet.address);
-      localStorage.setItem('wallet_type', wallet.walletType);
-    } else {
-      localStorage.removeItem('wallet_address');
-      localStorage.removeItem('wallet_type');
-    }
-  }, [wallet.address, wallet.walletType]);
-
-  return {
-    wallet,
-    connectWallet,
-    disconnectWallet,
-    isLiff
-  };
-};
+  return { wallet, connectWallet, disconnectWallet }
+}

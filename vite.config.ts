@@ -13,6 +13,7 @@ export default defineConfig({
       '@/providers': path.resolve(__dirname, './src/providers'),
       '@/pages': path.resolve(__dirname, './src/pages'),
       '@/utils': path.resolve(__dirname, './src/utils'),
+      '@shared': path.resolve(__dirname, './packages/shared/src'),
       '@/packages/shared': path.resolve(__dirname, './packages/shared/src'),
     },
   },

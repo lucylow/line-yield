@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 interface PlatformInfo {
-  isLiff: boolean;
-  isWeb: boolean;
-  isMobile: boolean;
-  userAgent: string;
-  platform: 'liff' | 'web';
+  isLiff: boolean
+  isWeb: boolean
+  isMobile: boolean
+  platform: 'liff' | 'web'
 }
 
 export const usePlatform = (): PlatformInfo => {
@@ -13,27 +12,26 @@ export const usePlatform = (): PlatformInfo => {
     isLiff: false,
     isWeb: true,
     isMobile: false,
-    userAgent: '',
     platform: 'web'
-  });
+  })
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return
 
-    const userAgent = window.navigator.userAgent;
-    const isLiff = window.location.href.includes('liff') || 
-                   userAgent.includes('Line') || 
-                   process.env.VITE_APP_MODE === 'liff';
-    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const userAgent = window.navigator.userAgent
+    const isLiff = window.location.href.includes('liff') ||
+                   userAgent.includes('Line') ||
+                   import.meta.env.VITE_APP_MODE === 'liff'
     
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
+
     setPlatformInfo({
       isLiff,
       isWeb: !isLiff,
       isMobile,
-      userAgent,
       platform: isLiff ? 'liff' : 'web'
-    });
-  }, []);
+    })
+  }, [])
 
-  return platformInfo;
-};
+  return platformInfo
+}
