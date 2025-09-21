@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { cn } from '../../src/utils/cn';
-import { useT } from '../../src/hooks/useT';
+import { cn } from '../utils/cn';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface LoanType {
   id: number;
@@ -32,7 +32,7 @@ export const LoanCreator: React.FC<LoanCreatorProps> = ({
   onLoanCreated,
   className = '' 
 }) => {
-  const t = useT();
+  const { t } = useTranslation();
   const [principalRequested, setPrincipalRequested] = useState<string>('');
   const [collateralAmount, setCollateralAmount] = useState<string>('');
   const [requiredCollateral, setRequiredCollateral] = useState<string>('');

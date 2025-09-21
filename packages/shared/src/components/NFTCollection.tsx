@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { cn } from '../../src/utils/cn';
-import { useT } from '../../src/hooks/useT';
+import { cn } from '../utils/cn';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface NFTTier {
   tier: number;
@@ -39,7 +39,7 @@ export const NFTCollection: React.FC<NFTCollectionProps> = ({
   userAddress, 
   className = '' 
 }) => {
-  const t = useT();
+  const { t } = useTranslation();
   const [nftCollection, setNftCollection] = useState<UserNFT[]>([]);
   const [tierInfo, setTierInfo] = useState<UserTierInfo | null>(null);
   const [allTiers, setAllTiers] = useState<NFTTier[]>([]);

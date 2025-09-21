@@ -273,3 +273,5 @@ export const ReferralPage: React.FC = () => {
     </div>
   );
 };
+
+export default ReferralPage;

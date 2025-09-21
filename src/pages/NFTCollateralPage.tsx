@@ -163,3 +163,5 @@ export const NFTCollateralPage: React.FC = () => {
   );
 };
 
+export default NFTCollateralPage;
+

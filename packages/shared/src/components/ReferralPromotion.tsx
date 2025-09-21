@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '../utils/cn';
-import { useT } from '../hooks/useT';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface ReferralPromotionProps {
   userAddress: string | null;
@@ -25,7 +25,7 @@ export const ReferralPromotion: React.FC<ReferralPromotionProps> = ({
   userAddress, 
   className = '' 
 }) => {
-  const t = useT();
+  const { t } = useTranslation();
   const [referralData, setReferralData] = useState<ReferralData | null>(null);
   const [inputReferralCode, setInputReferralCode] = useState<string>('');
   const [message, setMessage] = useState<string | null>(null);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { cn } from '../../src/utils/cn';
-import { useT } from '../../src/hooks/useT';
+import { cn } from '../utils/cn';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface LoanType {
   id: number;
@@ -30,7 +30,7 @@ export const LoanTypes: React.FC<LoanTypesProps> = ({
   onSelectLoanType,
   className = '' 
 }) => {
-  const t = useT();
+  const { t } = useTranslation();
   const [loanTypes, setLoanTypes] = useState<LoanType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

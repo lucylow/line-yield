@@ -288,3 +288,5 @@ export const LoanPage: React.FC = () => {
     </div>
   );
 };
+
+export default LoanPage;
