@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useUniversalWallet } from '../hooks/useUniversalWallet'
 import { usePlatform } from '../hooks/usePlatform'
 import { ConnectWalletModal } from './ConnectWalletModal'
+import { WalletConnectionToast } from './WalletConnectionToast'
 import { Button } from './Button'
 import { cn } from '../utils/cn'
 
@@ -13,6 +14,15 @@ export const ConnectWallet: React.FC<ConnectWalletProps> = ({ className = '' }) 
   const { wallet, connectWallet, disconnectWallet } = useUniversalWallet()
   const { isLiff } = usePlatform()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [toast, setToast] = useState<{
+    isVisible: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isVisible: false,
+    message: '',
+    type: 'success'
+  })
 
   const handleConnect = async (walletType?: string) => {
     try {
@@ -24,9 +34,18 @@ export const ConnectWallet: React.FC<ConnectWalletProps> = ({ className = '' }) 
       }
       console.log('Wallet connected successfully!')
       setIsModalOpen(false) // Close modal on successful connection
+      setToast({
+        isVisible: true,
+        message: `Successfully connected to ${walletType || 'wallet'}!`,
+        type: 'success'
+      })
     } catch (error) {
       console.error('Failed to connect wallet:', error)
-      alert(`Failed to connect wallet: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      setToast({
+        isVisible: true,
+        message: `Failed to connect wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        type: 'error'
+      })
     }
   }
 
@@ -73,6 +92,13 @@ export const ConnectWallet: React.FC<ConnectWalletProps> = ({ className = '' }) 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConnect={handleConnect}
+      />
+      
+      <WalletConnectionToast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast(prev => ({ ...prev, isVisible: false }))}
       />
     </>
   )

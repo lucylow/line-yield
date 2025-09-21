@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { AppLayout } from '../components/AppLayout';
 import { 
   ArrowUpDown, 
   ArrowRightLeft, 
@@ -21,9 +22,7 @@ import {
   ExternalLink,
   Info
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useWallet } from '@/hooks/useWallet';
-import { formatCurrency } from '@/utils/formatters';
+import { useWallet } from '../hooks/useWallet';
 
 interface Token {
   symbol: string;
@@ -402,7 +401,8 @@ const TradePage: React.FC<TradePageProps> = ({ onNavigate }) => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <AppLayout>
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Trade Center</h1>
         <p className="text-muted-foreground">
@@ -648,7 +648,8 @@ const TradePage: React.FC<TradePageProps> = ({ onNavigate }) => {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { cn } from '../../src/utils/cn';
-import { useT } from '../../src/hooks/useT';
+import { cn } from '../utils/cn';
+import { useT } from '../hooks/useT';
 
 interface ReferralPromotionProps {
   userAddress: string | null;

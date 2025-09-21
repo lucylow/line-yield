@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Input } from '../components/ui/input';
-import { AppLayout } from '../components/AppLayout';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { 
   Search,
   Filter,
@@ -90,7 +88,7 @@ interface DropCampaign {
   featured: boolean;
 }
 
-export const NFTMarketplace: React.FC = () => {
+const NFTMarketplace: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'home' | 'market' | 'trade' | 'my'>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -376,11 +374,12 @@ export const NFTMarketplace: React.FC = () => {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
+                <input
+                  type="text"
                   placeholder="Search collections, NFTs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -512,8 +511,7 @@ export const NFTMarketplace: React.FC = () => {
   }
 
   return (
-    <AppLayout>
-      <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -566,11 +564,9 @@ export const NFTMarketplace: React.FC = () => {
         {activeTab === 'trade' && renderTradeTab()}
         {activeTab === 'my' && renderMyTab()}
       </div>
-      </div>
-    </AppLayout>
+    </div>
   );
 };
 
+export { NFTMarketplace };
 export default NFTMarketplace;
-
-

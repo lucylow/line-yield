@@ -5,9 +5,11 @@ import { useWallet } from '../hooks/useWallet';
 import Chatbot from '../components/Chatbot';
 import { LineNextIntegration } from '../components/LineNextIntegration';
 import { ConnectWallet } from '@shared/components';
+import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const { isConnected, connect } = useWallet();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -20,11 +22,8 @@ const Landing = () => {
   }, []);
 
   const handleGetStarted = async () => {
-    if (!isConnected) {
-      connect();
-    }
-    // For now, just show an alert - can be replaced with actual dashboard navigation later
-    alert('Welcome to LINE Yield! Dashboard functionality will be implemented here.');
+    // Navigate directly to the main app without requiring wallet connection
+    navigate('/kaia-defi');
   };
 
   const handleConnectWallet = () => {
@@ -60,6 +59,7 @@ const Landing = () => {
               <Button 
                 variant="outline" 
                 size="sm"
+                onClick={handleGetStarted}
                 className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-300"
               >
                 <i className="fas fa-sign-in-alt mr-2"></i>
@@ -125,6 +125,7 @@ const Landing = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
+                    onClick={handleGetStarted}
                     className="w-full border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-300"
                   >
                     <i className="fas fa-sign-in-alt mr-2"></i>
@@ -180,6 +181,7 @@ const Landing = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
+                  onClick={handleGetStarted}
                   className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg font-semibold border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-300 hover:shadow-lg"
                 >
                   <PlayCircle className="w-4 h-4 md:w-5 md:h-5 mr-2" />

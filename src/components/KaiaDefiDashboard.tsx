@@ -8,10 +8,17 @@ import {
   ArrowDownRight,
   Zap,
   Shield,
-  Target
+  Target,
+  ArrowLeft,
+  Home,
+  Plus,
+  Minus,
+  RefreshCw
 } from 'lucide-react';
 import { kaiaService, KAIA_DEFI_CONFIG, TRADE_AND_EARN_CONFIG } from '../services/kaiaService';
 import { useTranslation } from '../i18n';
+import { useNavigate } from 'react-router-dom';
+import { AppLayout } from './AppLayout';
 
 interface DefiStats {
   totalValueLocked: string;
@@ -33,6 +40,7 @@ interface TradingPair {
 
 export const KaiaDefiDashboard: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DefiStats | null>(null);
   const [tradingPairs, setTradingPairs] = useState<TradingPair[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +58,7 @@ export const KaiaDefiDashboard: React.FC = () => {
       // Load DeFi stats
       const defiStats = await kaiaService.getKaiaDefiStats();
       
-      // Load wallet balances if connected
+      // Load wallet balances if connected, otherwise use mock data
       let kaiaBalance = '0';
       let usdtBalance = '0';
       let yieldVaultBalance = '0';
@@ -65,6 +73,12 @@ export const KaiaDefiDashboard: React.FC = () => {
         } catch (error) {
           console.warn('Failed to load wallet data:', error);
         }
+      } else {
+        // Use mock data when not connected
+        kaiaBalance = '1,250.50';
+        usdtBalance = '5,000.00';
+        yieldVaultBalance = '4,500.00';
+        pendingRewards = '125.75';
       }
 
       setStats({
@@ -143,55 +157,50 @@ export const KaiaDefiDashboard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Kaia DeFi Dashboard
-        </h1>
-        <p className="text-gray-600">
-          Trade and earn with Kaia-native USDT and stablecoin DeFi protocols
-        </p>
-      </div>
+    <AppLayout>
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Kaia DeFi Dashboard
+          </h1>
+          <p className="text-gray-600">
+            Trade and earn with Kaia-native USDT and stablecoin DeFi protocols
+          </p>
+        </div>
 
       {/* Connection Status */}
-      {!isConnected ? (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-          <Shield className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            Connect Your Wallet
-          </h3>
-          <p className="text-blue-700 mb-4">
-            Connect your wallet to access Kaia DeFi features and start trading & earning
-          </p>
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-3 h-3 bg-gray-400 rounded-full mr-3"></div>
+            <span className="text-gray-800 font-medium">
+              {isConnected ? `Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'Demo Mode - Using Mock Data'}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            {!isConnected && (
           <button
             onClick={connectWallet}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             Connect Wallet
           </button>
-        </div>
-      ) : (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-              <span className="text-green-800 font-medium">
-                Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-              </span>
-            </div>
+            )}
+            {isConnected && (
             <button
               onClick={() => {
                 setIsConnected(false);
                 setWalletAddress('');
               }}
-              className="text-green-600 hover:text-green-800 text-sm"
+                className="text-gray-600 hover:text-gray-800 text-sm"
             >
               Disconnect
             </button>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* DeFi Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -411,7 +420,8 @@ export const KaiaDefiDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

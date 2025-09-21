@@ -2,6 +2,7 @@ export { Layout } from './Layout';
 export { Button } from './Button';
 export { LoadingSpinner } from './LoadingSpinner';
 export { ConnectWalletModal } from './ConnectWalletModal';
+export { WalletConnectionToast } from './WalletConnectionToast';
 export { PurchasePrecautions } from './PurchasePrecautions';
 export { ConnectedWalletDisplay } from './ConnectedWalletDisplay';
 export { PaymentNotification, PaymentToast } from './PaymentNotification';
@@ -21,3 +22,11 @@ export { LeaderboardComponent } from './Leaderboard';
 export { NFTCard } from './NFTCard';
 export { PointExchange } from './PointExchange';
 export { GamificationDashboard } from './GamificationDashboard';
+export { KaiaDefiDashboard } from './KaiaDefiDashboard';
+export { KaiaTradeAndEarn } from './KaiaTradeAndEarn';
+export { NFTMarketplace } from './NFTMarketplace';
+
+// UI Components
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './ui/card';
+export { Button as UIButton, buttonVariants } from './ui/button';
+export { Badge as UIBadge, badgeVariants } from './ui/badge';
