@@ -619,3 +619,4 @@ export const NFTCollectionManager: React.FC<NFTCollectionManagerProps> = ({
   );
 };
 
+

@@ -144,3 +144,4 @@ export const canAccessRoute = (path: string, isAuthenticated: boolean): boolean 
 
 export default ROUTES;
 
+

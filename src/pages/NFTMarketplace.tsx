@@ -570,3 +570,4 @@ export const NFTMarketplace: React.FC = () => {
 
 export default NFTMarketplace;
 
+

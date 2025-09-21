@@ -254,3 +254,4 @@ contract YieldToken is ERC20, ERC20Burnable, ERC20Pausable, ERC20Capped, AccessC
     }
 }
 
+

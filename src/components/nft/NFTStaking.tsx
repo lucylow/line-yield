@@ -506,3 +506,4 @@ export const NFTStaking: React.FC = () => {
 
 export default NFTStaking;
 
+

@@ -66,20 +66,57 @@ export const useUniversalWallet = () => {
           })
         }
       } else {
-        // Default web wallet connection (MetaMask, etc.)
-        if (!(window as any).ethereum) {
-          throw new Error('No wallet found')
+        // Default web wallet connection (MetaMask, Kaia Wallet, etc.)
+        // Check for Kaia wallet first, then fallback to ethereum
+        let provider = (window as any).kaia || (window as any).ethereum
+        
+        if (!provider) {
+          throw new Error('No wallet found. Please install Kaia Wallet or MetaMask.')
         }
         
-        const provider = (window as any).ethereum
-        const accounts = await provider.request({ method: 'eth_requestAccounts' })
-        const address = accounts[0]
-        
-        setWallet({
-          isConnected: true,
-          address,
-          provider
-        })
+        try {
+          const accounts = await provider.request({ method: 'eth_requestAccounts' })
+          const address = accounts[0]
+          
+          // If using Kaia wallet, switch to Kaia network
+          if ((window as any).kaia) {
+            try {
+              await provider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0x2019' }], // Kaia chain ID in hex
+              })
+            } catch (switchError: any) {
+              // If the network doesn't exist, add it
+              if (switchError.code === 4902) {
+                await provider.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0x2019',
+                    chainName: 'Kaia Mainnet',
+                    rpcUrls: ['https://public-en.node.kaia.io'],
+                    blockExplorerUrls: ['https://kaiascan.io'],
+                    nativeCurrency: {
+                      name: 'Kaia',
+                      symbol: 'KAIA',
+                      decimals: 18,
+                    },
+                  }],
+                })
+              }
+            }
+          }
+          
+          setWallet({
+            isConnected: true,
+            address,
+            provider
+          })
+          
+          console.log(`Successfully connected to wallet: ${address}`)
+        } catch (error) {
+          console.error('Wallet connection failed:', error)
+          throw error
+        }
       }
     } catch (error) {
       console.error('Wallet connection failed:', error)

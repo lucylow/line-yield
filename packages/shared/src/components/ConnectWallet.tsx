@@ -16,15 +16,17 @@ export const ConnectWallet: React.FC<ConnectWalletProps> = ({ className = '' }) 
 
   const handleConnect = async (walletType?: string) => {
     try {
+      console.log(`Attempting to connect wallet with type: ${walletType || 'default'}`)
       if (walletType) {
         await connectWallet({ type: walletType })
       } else {
         await connectWallet()
       }
+      console.log('Wallet connected successfully!')
       setIsModalOpen(false) // Close modal on successful connection
     } catch (error) {
       console.error('Failed to connect wallet:', error)
-      // Optionally show a toast notification for error
+      alert(`Failed to connect wallet: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 

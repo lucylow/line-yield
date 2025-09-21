@@ -284,3 +284,4 @@ LIMIT 1;
 -- GRANT SELECT, INSERT, UPDATE ON kaia_payments TO your_app_user;
 -- GRANT SELECT ON kaia_payment_summary TO your_app_user;
 -- GRANT SELECT ON current_kaia_fee_structure TO your_app_user;
+

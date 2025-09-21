@@ -289,3 +289,4 @@ INSERT INTO governance_proposals (proposer, title, description, start_time, end_
 ('0x2345678901234567890123456789012345678901', 'Add New Collateral Types', 'Proposal to add USDC and WBTC as collateral types for loans to increase platform utility and attract more users.', EXTRACT(EPOCH FROM NOW())::INTEGER, EXTRACT(EPOCH FROM NOW() + INTERVAL '7 days')::INTEGER, '890000000000000000000000', '210000000000000000000000', 'active')
 ON CONFLICT DO NOTHING;
 
+

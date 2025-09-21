@@ -328,3 +328,4 @@ export const KaiaPaymentModal: React.FC<KaiaPaymentModalProps> = ({
 
 export default KaiaPaymentModal;
 
+

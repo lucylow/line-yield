@@ -442,3 +442,4 @@ export class KaiaPaymentService {
 
 export const kaiaPaymentService = KaiaPaymentService.getInstance();
 
+

@@ -534,3 +534,4 @@ export const convertFiatToCrypto = (
   return fiatAmount * (rates[fiatCurrency]?.[cryptoCurrency] || 1);
 };
 
+
